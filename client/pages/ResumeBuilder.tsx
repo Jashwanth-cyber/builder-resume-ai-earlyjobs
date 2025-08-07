@@ -31,7 +31,9 @@ import {
   Settings,
   RotateCcw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Save,
+  X
 } from "lucide-react";
 
 interface PersonalInfo {
@@ -144,6 +146,8 @@ const templates = [
 export default function ResumeBuilder() {
   const [activeTemplate, setActiveTemplate] = useState('modern');
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const [isReorderMode, setIsReorderMode] = useState(false);
+  const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Section collapse states
@@ -191,6 +195,41 @@ export default function ResumeBuilder() {
       }
       return newSet;
     });
+  }, []);
+
+  // Drag and drop functions
+  const handleDragStart = useCallback((e: React.DragEvent, sectionId: string) => {
+    setDraggedSection(sectionId);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetSectionId: string) => {
+    e.preventDefault();
+    if (!draggedSection || draggedSection === targetSectionId) return;
+
+    setSectionOrder(prev => {
+      const newOrder = [...prev];
+      const draggedIndex = newOrder.findIndex(s => s.id === draggedSection);
+      const targetIndex = newOrder.findIndex(s => s.id === targetSectionId);
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      
+      // Remove dragged item and insert at target position
+      const [draggedItem] = newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedItem);
+      
+      return newOrder;
+    });
+    setDraggedSection(null);
+  }, [draggedSection]);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedSection(null);
   }, []);
 
   // Update personal info
@@ -377,6 +416,172 @@ export default function ResumeBuilder() {
   };
 
   const currentTemplate = getCurrentTemplate();
+
+  // Render section content for live preview
+  const renderSectionContent = useCallback((sectionConfig: SectionOrder) => {
+    const sectionId = sectionConfig.id;
+    
+    if (sectionId === 'summary' && resumeData.professionalSummary) {
+      return (
+        <div key="summary">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Professional Summary
+          </h2>
+          <p className="text-gray-700 leading-relaxed">
+            {resumeData.professionalSummary}
+          </p>
+        </div>
+      );
+    }
+
+    if (sectionId === 'experience' && resumeData.workExperience.length > 0) {
+      return (
+        <div key="experience">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Work Experience
+          </h2>
+          <div className="space-y-4">
+            {resumeData.workExperience.map((work) => (
+              <div key={work.id}>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {work.position || 'Software Developer Intern'}
+                    </h3>
+                    <p className={`${currentTemplate.accent} font-medium`}>
+                      {work.company || 'Company Name'}
+                    </p>
+                  </div>
+                  <span className="text-gray-500 text-sm">
+                    {work.startDate && work.endDate 
+                      ? `${work.startDate} - ${work.endDate}`
+                      : work.startDate || work.endDate || '2023-08 - Present'
+                    }
+                  </span>
+                </div>
+                {work.description && (
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {work.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (sectionId === 'education' && resumeData.education.length > 0) {
+      return (
+        <div key="education">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Education
+          </h2>
+          <div className="space-y-3">
+            {resumeData.education.map((edu) => (
+              <div key={edu.id} className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    {edu.degree} {edu.field && `in ${edu.field}`}
+                  </h3>
+                  <p className={`${currentTemplate.accent} font-medium`}>
+                    {edu.school}
+                  </p>
+                  {edu.gpa && (
+                    <p className="text-gray-600 text-sm">GPA: {edu.gpa}</p>
+                  )}
+                </div>
+                <span className="text-gray-500 text-sm">
+                  {edu.startDate && edu.endDate 
+                    ? `${edu.startDate} - ${edu.endDate}`
+                    : edu.startDate || edu.endDate || 'Date Range'
+                  }
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (sectionId === 'skills' && resumeData.skills.length > 0) {
+      return (
+        <div key="skills">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Skills
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {resumeData.skills.map((skill) => (
+              <Badge key={skill} variant="secondary" className="text-sm">
+                {skill}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (sectionId === 'projects' && resumeData.projects.length > 0) {
+      return (
+        <div key="projects">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Projects
+          </h2>
+          <div className="space-y-4">
+            {resumeData.projects.map((project) => (
+              <div key={project.id}>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-gray-900">
+                    {project.name || 'Project Name'}
+                  </h3>
+                  {project.link && (
+                    <a 
+                      href={project.link} 
+                      className={`${currentTemplate.accent} text-sm hover:underline`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      View Project
+                    </a>
+                  )}
+                </div>
+                {project.technologies && (
+                  <p className="text-gray-600 text-sm mb-1">
+                    <span className="font-medium">Technologies:</span> {project.technologies}
+                  </p>
+                )}
+                {project.description && (
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {project.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (sectionId === 'certifications' && resumeData.certifications.length > 0) {
+      return (
+        <div key="certifications">
+          <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
+            Certifications
+          </h2>
+          <div className="space-y-2">
+            {resumeData.certifications.map((cert) => (
+              <div key={cert} className="flex items-center">
+                <div className={`w-2 h-2 ${currentTemplate.accent.replace('text-', 'bg-')} rounded-full mr-3`}></div>
+                <span className="text-gray-700">{cert}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  }, [resumeData, currentTemplate]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -920,12 +1125,34 @@ export default function ResumeBuilder() {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" size="sm">
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Reorder
+                <Button 
+                  variant={isReorderMode ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setIsReorderMode(!isReorderMode)}
+                >
+                  {isReorderMode ? (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Order
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reorder
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
+
+            {/* Reorder Instructions */}
+            {isReorderMode && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <p className="text-sm text-orange-700">
+                  <strong>Reorder Mode:</strong> Drag and drop sections below to reorder them. Personal Information cannot be moved.
+                </p>
+              </div>
+            )}
 
             {/* Live Preview */}
             <Card>
@@ -933,7 +1160,7 @@ export default function ResumeBuilder() {
                 <div id="resume-preview" className="bg-white rounded-lg min-h-[700px] shadow-sm overflow-hidden">
                   {/* Resume Preview Content with Live Updates */}
                   <div className="space-y-6">
-                    {/* Header */}
+                    {/* Header - Always at top, not draggable */}
                     <div className={`${currentTemplate.headerBg} ${currentTemplate.headerText} p-6`}>
                       <div className="flex items-center space-x-4">
                         {resumeData.profilePicture && (
@@ -958,186 +1185,55 @@ export default function ResumeBuilder() {
                             <span>{resumeData.personalInfo.location || 'Hyderabad'}</span>
                           </div>
                           <div className="flex flex-wrap items-center space-x-4 text-sm mt-1 opacity-90">
-                            {(resumeData.personalInfo.linkedin || resumeData.personalInfo.website) && (
-                              <>
-                                {resumeData.personalInfo.linkedin && (
-                                  <span>LinkedIn: {resumeData.personalInfo.linkedin}</span>
-                                )}
-                                {resumeData.personalInfo.website && (
-                                  <span>Website: {resumeData.personalInfo.website}</span>
-                                )}
-                              </>
+                            {resumeData.personalInfo.linkedin && (
+                              <span><strong>LinkedIn:</strong> {resumeData.personalInfo.linkedin}</span>
+                            )}
+                            {resumeData.personalInfo.website && (
+                              <span><strong>Website:</strong> {resumeData.personalInfo.website}</span>
                             )}
                           </div>
+                          {resumeData.personalInfo.github && (
+                            <div className="text-sm mt-1 opacity-90">
+                              <span><strong>GitHub:</strong> {resumeData.personalInfo.github}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
 
                     <div className="px-6 pb-6 space-y-6">
-                      {/* Dynamic Sections Based on Order */}
-                      {sectionOrder.filter(section => section.visible).map((sectionConfig) => {
-                        const sectionId = sectionConfig.id;
-                        
-                        if (sectionId === 'summary' && resumeData.professionalSummary) {
-                          return (
-                            <div key="summary">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Professional Summary
-                              </h2>
-                              <p className="text-gray-700 leading-relaxed">
-                                {resumeData.professionalSummary}
-                              </p>
-                            </div>
-                          );
-                        }
+                      {/* Dynamic Sections - Draggable in reorder mode */}
+                      {sectionOrder.filter(section => section.visible).map((sectionConfig, index) => {
+                        const content = renderSectionContent(sectionConfig);
+                        if (!content) return null;
 
-                        if (sectionId === 'experience' && resumeData.workExperience.length > 0) {
+                        if (isReorderMode) {
                           return (
-                            <div key="experience">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Work Experience
-                              </h2>
-                              <div className="space-y-4">
-                                {resumeData.workExperience.map((work) => (
-                                  <div key={work.id}>
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h3 className="font-semibold text-gray-900">
-                                          {work.position || 'Software Developer Intern'}
-                                        </h3>
-                                        <p className={`${currentTemplate.accent} font-medium`}>
-                                          {work.company || 'Company Name'}
-                                        </p>
-                                      </div>
-                                      <span className="text-gray-500 text-sm">
-                                        {work.startDate && work.endDate 
-                                          ? `${work.startDate} - ${work.endDate}`
-                                          : work.startDate || work.endDate || '2023-08 - Present'
-                                        }
-                                      </span>
-                                    </div>
-                                    {work.description && (
-                                      <p className="text-gray-700 text-sm leading-relaxed">
-                                        {work.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                ))}
+                            <div
+                              key={sectionConfig.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, sectionConfig.id)}
+                              onDragOver={handleDragOver}
+                              onDrop={(e) => handleDrop(e, sectionConfig.id)}
+                              onDragEnd={handleDragEnd}
+                              className={`border-2 border-dashed border-orange-300 rounded-lg p-4 cursor-move transition-all hover:border-orange-400 hover:shadow-md ${
+                                draggedSection === sectionConfig.id ? 'opacity-50' : 'opacity-100'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <GripVertical className="w-4 h-4 text-orange-500" />
+                                  <span className="text-sm font-medium text-orange-700">
+                                    Drag to reorder: {sectionConfig.name}
+                                  </span>
+                                </div>
                               </div>
+                              {content}
                             </div>
                           );
                         }
 
-                        if (sectionId === 'education' && resumeData.education.length > 0) {
-                          return (
-                            <div key="education">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Education
-                              </h2>
-                              <div className="space-y-3">
-                                {resumeData.education.map((edu) => (
-                                  <div key={edu.id} className="flex justify-between items-start">
-                                    <div>
-                                      <h3 className="font-semibold text-gray-900">
-                                        {edu.degree} {edu.field && `in ${edu.field}`}
-                                      </h3>
-                                      <p className={`${currentTemplate.accent} font-medium`}>
-                                        {edu.school}
-                                      </p>
-                                      {edu.gpa && (
-                                        <p className="text-gray-600 text-sm">GPA: {edu.gpa}</p>
-                                      )}
-                                    </div>
-                                    <span className="text-gray-500 text-sm">
-                                      {edu.startDate && edu.endDate 
-                                        ? `${edu.startDate} - ${edu.endDate}`
-                                        : edu.startDate || edu.endDate || 'Date Range'
-                                      }
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (sectionId === 'skills' && resumeData.skills.length > 0) {
-                          return (
-                            <div key="skills">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Skills
-                              </h2>
-                              <div className="flex flex-wrap gap-2">
-                                {resumeData.skills.map((skill) => (
-                                  <Badge key={skill} variant="secondary" className="text-sm">
-                                    {skill}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (sectionId === 'projects' && resumeData.projects.length > 0) {
-                          return (
-                            <div key="projects">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Projects
-                              </h2>
-                              <div className="space-y-4">
-                                {resumeData.projects.map((project) => (
-                                  <div key={project.id}>
-                                    <div className="flex justify-between items-start mb-2">
-                                      <h3 className="font-semibold text-gray-900">
-                                        {project.name || 'Project Name'}
-                                      </h3>
-                                      {project.link && (
-                                        <a 
-                                          href={project.link} 
-                                          className={`${currentTemplate.accent} text-sm hover:underline`}
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                        >
-                                          View Project
-                                        </a>
-                                      )}
-                                    </div>
-                                    {project.technologies && (
-                                      <p className="text-gray-600 text-sm mb-1">
-                                        <span className="font-medium">Technologies:</span> {project.technologies}
-                                      </p>
-                                    )}
-                                    {project.description && (
-                                      <p className="text-gray-700 text-sm leading-relaxed">
-                                        {project.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (sectionId === 'certifications' && resumeData.certifications.length > 0) {
-                          return (
-                            <div key="certifications">
-                              <h2 className={`text-xl font-bold ${currentTemplate.sectionHeader} mb-3 border-b pb-1`}>
-                                Certifications
-                              </h2>
-                              <div className="space-y-2">
-                                {resumeData.certifications.map((cert) => (
-                                  <div key={cert} className="flex items-center">
-                                    <div className={`w-2 h-2 ${currentTemplate.accent.replace('text-', 'bg-')} rounded-full mr-3`}></div>
-                                    <span className="text-gray-700">{cert}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        return null;
+                        return content;
                       })}
                     </div>
                   </div>
