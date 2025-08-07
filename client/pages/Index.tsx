@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Upload, Plus, FileText, Sparkles, Download, Zap } from "lucide-react";
 
 export default function Index() {
@@ -31,13 +37,17 @@ export default function Index() {
         <div className="text-center max-w-4xl mx-auto mb-16">
           <h2 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
             Create Your Perfect Resume in
-            <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent"> Minutes</span>
+            <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              {" "}
+              Minutes
+            </span>
           </h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Build professional resumes with AI assistance, beautiful templates, and instant PDF downloads.
-            Get hired faster with our modern resume builder.
+            Build professional resumes with AI assistance, beautiful templates,
+            and instant PDF downloads. Get hired faster with our modern resume
+            builder.
           </p>
-          
+
           {/* Feature highlights */}
           <div className="flex justify-center items-center space-x-8 mb-12 text-sm text-gray-500">
             <div className="flex items-center space-x-2">
@@ -67,7 +77,8 @@ export default function Index() {
                 Upload Existing Resume
               </CardTitle>
               <CardDescription className="text-gray-600 text-base">
-                Have a resume already? Upload it and we'll extract your information automatically using AI parsing.
+                Have a resume already? Upload it and we'll extract your
+                information automatically using AI parsing.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
@@ -102,7 +113,8 @@ export default function Index() {
                 Create New Resume
               </CardTitle>
               <CardDescription className="text-gray-600 text-base">
-                Start fresh with our guided builder. Get AI suggestions and choose from beautiful templates.
+                Start fresh with our guided builder. Get AI suggestions and
+                choose from beautiful templates.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
@@ -130,28 +142,41 @@ export default function Index() {
 
         {/* Additional Features */}
         <div className="mt-20 text-center max-w-3xl mx-auto">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">Why Choose ResumeForge?</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-8">
+            Why Choose ResumeForge?
+          </h3>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-6 h-6 text-orange-600" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">AI-Powered</h4>
-              <p className="text-gray-600 text-sm">Smart suggestions for professional summaries and job descriptions</p>
+              <p className="text-gray-600 text-sm">
+                Smart suggestions for professional summaries and job
+                descriptions
+              </p>
             </div>
             <div className="p-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-6 h-6 text-orange-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Beautiful Templates</h4>
-              <p className="text-gray-600 text-sm">Choose from modern, ATS-friendly resume templates</p>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Beautiful Templates
+              </h4>
+              <p className="text-gray-600 text-sm">
+                Choose from modern, ATS-friendly resume templates
+              </p>
             </div>
             <div className="p-6">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Download className="w-6 h-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Instant Export</h4>
-              <p className="text-gray-600 text-sm">Download your perfect resume as a high-quality PDF</p>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Instant Export
+              </h4>
+              <p className="text-gray-600 text-sm">
+                Download your perfect resume as a high-quality PDF
+              </p>
             </div>
           </div>
         </div>
