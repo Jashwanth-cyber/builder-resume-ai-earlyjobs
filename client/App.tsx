@@ -29,4 +29,12 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Prevent multiple root creation during hot reload
+const rootElement = document.getElementById("root")!;
+if (!rootElement._reactRoot) {
+  const root = createRoot(rootElement);
+  rootElement._reactRoot = root;
+  root.render(<App />);
+} else {
+  rootElement._reactRoot.render(<App />);
+}
