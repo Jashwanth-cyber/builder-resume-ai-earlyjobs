@@ -439,7 +439,7 @@ export default function ResumeBuilder() {
               </Button>
               <Button 
                 onClick={downloadPDF}
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Download PDF
