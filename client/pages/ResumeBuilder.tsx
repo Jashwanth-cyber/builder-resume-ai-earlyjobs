@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   ArrowLeft, 
   FileText, 
@@ -28,7 +29,9 @@ import {
   MoveUp,
   MoveDown,
   Settings,
-  RotateCcw
+  RotateCcw,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface PersonalInfo {
@@ -38,6 +41,7 @@ interface PersonalInfo {
   location: string;
   linkedin: string;
   website: string;
+  github: string;
 }
 
 interface Education {
@@ -139,9 +143,11 @@ const templates = [
 
 export default function ResumeBuilder() {
   const [activeTemplate, setActiveTemplate] = useState('modern');
-  const [activeSection, setActiveSection] = useState('personal');
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Section collapse states
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set(['summary', 'education', 'experience', 'skills', 'certifications', 'projects']));
   
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
@@ -150,7 +156,8 @@ export default function ResumeBuilder() {
       phone: '',
       location: '',
       linkedin: '',
-      website: ''
+      website: '',
+      github: ''
     },
     professionalSummary: '',
     education: [],
@@ -172,6 +179,19 @@ export default function ResumeBuilder() {
 
   const [currentSkill, setCurrentSkill] = useState('');
   const [currentCertification, setCurrentCertification] = useState('');
+
+  // Section toggle function
+  const toggleSection = useCallback((sectionId: string) => {
+    setCollapsedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  }, []);
 
   // Update personal info
   const updatePersonalInfo = useCallback((field: keyof PersonalInfo, value: string) => {
@@ -333,56 +353,23 @@ export default function ResumeBuilder() {
     }));
   }, []);
 
-  // Section reordering
-  const moveSectionUp = useCallback((index: number) => {
-    if (index > 0) {
-      setSectionOrder(prev => {
-        const newOrder = [...prev];
-        [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
-        return newOrder;
-      });
-    }
-  }, []);
-
-  const moveSectionDown = useCallback((index: number) => {
-    setSectionOrder(prev => {
-      if (index < prev.length - 1) {
-        const newOrder = [...prev];
-        [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-        return newOrder;
-      }
-      return prev;
-    });
-  }, []);
-
-  const toggleSectionVisibility = useCallback((id: string) => {
-    setSectionOrder(prev => 
-      prev.map(section => 
-        section.id === id ? { ...section, visible: !section.visible } : section
-      )
-    );
-  }, []);
-
   // PDF Download function
   const downloadPDF = useCallback(() => {
     // In a real implementation, you would use a library like jsPDF or html2pdf
-    // For now, we'll simulate the download
     const element = document.getElementById('resume-preview');
     if (element) {
-      // This is a simplified implementation
-      // In production, use html2pdf.js or similar library
       alert('PDF download functionality would be implemented here using html2pdf.js or similar library');
     }
   }, []);
 
   const sections = [
-    { id: 'personal', name: 'Personal Information', icon: User, hasAI: false },
-    { id: 'summary', name: 'Professional Summary', icon: FileText, hasAI: true },
-    { id: 'experience', name: 'Work Experience', icon: Briefcase, hasAI: true },
-    { id: 'education', name: 'Education', icon: GraduationCap, hasAI: true },
-    { id: 'skills', name: 'Skills', icon: Code, hasAI: true },
-    { id: 'certifications', name: 'Certifications', icon: Award, hasAI: false },
-    { id: 'projects', name: 'Projects', icon: FolderOpen, hasAI: false }
+    { id: 'personal', name: 'Personal Information', icon: User, required: true },
+    { id: 'summary', name: 'Professional Summary', icon: FileText, required: false },
+    { id: 'experience', name: 'Work Experience', icon: Briefcase, required: false },
+    { id: 'education', name: 'Education', icon: GraduationCap, required: false },
+    { id: 'skills', name: 'Skills', icon: Code, required: false },
+    { id: 'certifications', name: 'Certifications', icon: Award, required: false },
+    { id: 'projects', name: 'Projects', icon: FolderOpen, required: false }
   ];
 
   const getCurrentTemplate = () => {
@@ -433,448 +420,463 @@ export default function ResumeBuilder() {
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Panel - Section Navigation */}
+          {/* Left Panel - Collapsible Sections */}
           <div className="space-y-4">
             {sections.map((section) => {
               const Icon = section.icon;
-              const isActive = activeSection === section.id;
+              const isCollapsed = collapsedSections.has(section.id);
               
               return (
-                <div
+                <Collapsible
                   key={section.id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                    isActive ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'
-                  }`}
-                  onClick={() => setActiveSection(section.id)}
+                  open={!isCollapsed}
+                  onOpenChange={() => toggleSection(section.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-6 h-6 rounded flex items-center justify-center ${
-                        isActive ? 'text-orange-600' : 'text-gray-500'
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className={`font-medium ${
-                        isActive ? 'text-orange-900' : 'text-gray-700'
-                      }`}>
-                        {section.name}
-                      </span>
-                      {section.id === 'personal' && (
-                        <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700">
-                          Required
-                        </Badge>
-                      )}
-                    </div>
-                    {section.hasAI && (
-                      <Button 
-                        size="sm" 
-                        className="bg-orange-500 hover:bg-orange-600 text-white h-7 px-3 text-xs"
-                      >
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        AI Suggest
-                      </Button>
-                    )}
-                    <div className="text-gray-400">
-                      <ArrowLeft className="w-4 h-4 rotate-180" />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Form Content */}
-            {activeSection && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    {sections.find(s => s.id === activeSection)?.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Personal Info Section */}
-                  {activeSection === 'personal' && (
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                          {resumeData.profilePicture ? (
-                            <img 
-                              src={resumeData.profilePicture} 
-                              alt="Profile" 
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <User className="w-8 h-8 text-gray-400" />
-                          )}
-                        </div>
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleProfilePictureUpload}
-                          accept="image/*"
-                          className="hidden"
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <Camera className="w-4 h-4 mr-2" />
-                          Upload Photo
-                        </Button>
-                      </div>
-                      <Separator />
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="fullName">Full Name</Label>
-                          <Input 
-                            id="fullName" 
-                            placeholder="John Doe" 
-                            value={resumeData.personalInfo.fullName}
-                            onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="john@example.com" 
-                            value={resumeData.personalInfo.email}
-                            onChange={(e) => updatePersonalInfo('email', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input 
-                            id="phone" 
-                            placeholder="+1 (555) 123-4567" 
-                            value={resumeData.personalInfo.phone}
-                            onChange={(e) => updatePersonalInfo('phone', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="location">Location</Label>
-                          <Input 
-                            id="location" 
-                            placeholder="New York, NY" 
-                            value={resumeData.personalInfo.location}
-                            onChange={(e) => updatePersonalInfo('location', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="linkedin">LinkedIn</Label>
-                          <Input 
-                            id="linkedin" 
-                            placeholder="linkedin.com/in/johndoe" 
-                            value={resumeData.personalInfo.linkedin}
-                            onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="website">Website</Label>
-                          <Input 
-                            id="website" 
-                            placeholder="johndoe.com" 
-                            value={resumeData.personalInfo.website}
-                            onChange={(e) => updatePersonalInfo('website', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Professional Summary Section */}
-                  {activeSection === 'summary' && (
-                    <div className="space-y-4">
-                      <Textarea
-                        placeholder="Write a compelling professional summary that highlights your key achievements and career goals..."
-                        className="min-h-[120px]"
-                        value={resumeData.professionalSummary}
-                        onChange={(e) => updateProfessionalSummary(e.target.value)}
-                      />
-                    </div>
-                  )}
-
-                  {/* Education Section */}
-                  {activeSection === 'education' && (
-                    <div className="space-y-4">
-                      {resumeData.education.map((edu) => (
-                        <Card key={edu.id} className="border-gray-200">
-                          <CardContent className="pt-4">
-                            <div className="space-y-3">
-                              <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                  <Label>School/University</Label>
-                                  <Input 
-                                    placeholder="University of California" 
-                                    value={edu.school}
-                                    onChange={(e) => updateEducation(edu.id, 'school', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Degree</Label>
-                                  <Input 
-                                    placeholder="Bachelor of Science" 
-                                    value={edu.degree}
-                                    onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Field of Study</Label>
-                                  <Input 
-                                    placeholder="Computer Science" 
-                                    value={edu.field}
-                                    onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>GPA (Optional)</Label>
-                                  <Input 
-                                    placeholder="3.8" 
-                                    value={edu.gpa}
-                                    onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Start Date</Label>
-                                  <Input 
-                                    type="month" 
-                                    value={edu.startDate}
-                                    onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>End Date</Label>
-                                  <Input 
-                                    type="month" 
-                                    value={edu.endDate}
-                                    onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
-                                  />
-                                </div>
-                              </div>
+                  <Card className="border-gray-200">
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-6 h-6 rounded flex items-center justify-center text-gray-600">
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <span className="font-medium text-gray-800">
+                              {section.name}
+                            </span>
+                            {section.required && (
+                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700">
+                                Required
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {section.id === 'experience' && (
                               <Button 
-                                variant="destructive" 
                                 size="sm" 
-                                className="w-fit"
-                                onClick={() => removeEducation(edu.id)}
+                                className="bg-orange-500 hover:bg-orange-600 text-white h-7 px-3 text-xs"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Remove
+                                <Sparkles className="w-3 h-3 mr-1" />
+                                AI Suggest
+                              </Button>
+                            )}
+                            {isCollapsed ? (
+                              <ChevronDown className="w-4 h-4 text-gray-400" />
+                            ) : (
+                              <ChevronUp className="w-4 h-4 text-gray-400" />
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent>
+                      <CardContent className="pt-0 space-y-4">
+                        {/* Personal Info Section */}
+                        {section.id === 'personal' && (
+                          <div className="space-y-4">
+                            <div className="text-center">
+                              <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                                {resumeData.profilePicture ? (
+                                  <img 
+                                    src={resumeData.profilePicture} 
+                                    alt="Profile" 
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <User className="w-8 h-8 text-gray-400" />
+                                )}
+                              </div>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleProfilePictureUpload}
+                                accept="image/*"
+                                className="hidden"
+                              />
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                              >
+                                <Camera className="w-4 h-4 mr-2" />
+                                Upload Photo
                               </Button>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      <Button onClick={addEducation} variant="outline" className="w-full">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Education
-                      </Button>
-                    </div>
-                  )}
-
-                  {/* Work Experience Section */}
-                  {activeSection === 'experience' && (
-                    <div className="space-y-4">
-                      {resumeData.workExperience.map((work) => (
-                        <Card key={work.id} className="border-gray-200">
-                          <CardContent className="pt-4">
-                            <div className="space-y-3">
-                              <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                  <Label>Company</Label>
-                                  <Input 
-                                    placeholder="Tech Corp" 
-                                    value={work.company}
-                                    onChange={(e) => updateWorkExperience(work.id, 'company', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Position</Label>
-                                  <Input 
-                                    placeholder="Software Engineer" 
-                                    value={work.position}
-                                    onChange={(e) => updateWorkExperience(work.id, 'position', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Start Date</Label>
-                                  <Input 
-                                    type="month" 
-                                    value={work.startDate}
-                                    onChange={(e) => updateWorkExperience(work.id, 'startDate', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>End Date</Label>
-                                  <Input 
-                                    type="month" 
-                                    value={work.endDate}
-                                    onChange={(e) => updateWorkExperience(work.id, 'endDate', e.target.value)}
-                                  />
-                                </div>
-                              </div>
+                            <Separator />
+                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <Label>Job Description</Label>
-                                <Textarea 
-                                  placeholder="Describe your key responsibilities and achievements..."
-                                  className="min-h-[100px]"
-                                  value={work.description}
-                                  onChange={(e) => updateWorkExperience(work.id, 'description', e.target.value)}
+                                <Label htmlFor="fullName">Full Name *</Label>
+                                <Input 
+                                  id="fullName" 
+                                  placeholder="Jashwanth Sheri" 
+                                  value={resumeData.personalInfo.fullName}
+                                  onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
                                 />
                               </div>
-                              <Button 
-                                variant="destructive" 
-                                size="sm" 
-                                className="w-fit"
-                                onClick={() => removeWorkExperience(work.id)}
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Remove
-                              </Button>
+                              <div>
+                                <Label htmlFor="email">Email Address *</Label>
+                                <Input 
+                                  id="email" 
+                                  type="email" 
+                                  placeholder="jashwanthsheri68@gmail.com" 
+                                  value={resumeData.personalInfo.email}
+                                  onChange={(e) => updatePersonalInfo('email', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="phone">Phone Number *</Label>
+                                <Input 
+                                  id="phone" 
+                                  placeholder="9010449268" 
+                                  value={resumeData.personalInfo.phone}
+                                  onChange={(e) => updatePersonalInfo('phone', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="location">Location *</Label>
+                                <Input 
+                                  id="location" 
+                                  placeholder="Hyderabad" 
+                                  value={resumeData.personalInfo.location}
+                                  onChange={(e) => updatePersonalInfo('location', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="website">Website</Label>
+                                <Input 
+                                  id="website" 
+                                  placeholder="https://jashwanthsheri.netlify.app/" 
+                                  value={resumeData.personalInfo.website}
+                                  onChange={(e) => updatePersonalInfo('website', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="linkedin">LinkedIn</Label>
+                                <Input 
+                                  id="linkedin" 
+                                  placeholder="https://www.linkedin.com/in/jashwanth-sheri/" 
+                                  value={resumeData.personalInfo.linkedin}
+                                  onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <Label htmlFor="github">GitHub</Label>
+                                <Input 
+                                  id="github" 
+                                  placeholder="https://github.com/Jashwanth-Sheri" 
+                                  value={resumeData.personalInfo.github}
+                                  onChange={(e) => updatePersonalInfo('github', e.target.value)}
+                                />
+                              </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      <Button onClick={addWorkExperience} variant="outline" className="w-full">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Work Experience
-                      </Button>
-                    </div>
-                  )}
+                          </div>
+                        )}
 
-                  {/* Skills Section */}
-                  {activeSection === 'skills' && (
-                    <div className="space-y-4">
-                      <div className="flex space-x-2">
-                        <Input 
-                          placeholder="Add a skill" 
-                          value={currentSkill}
-                          onChange={(e) => setCurrentSkill(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              addSkill(currentSkill);
-                            }
-                          }}
-                        />
-                        <Button onClick={() => addSkill(currentSkill)}>
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {resumeData.skills.map((skill) => (
-                          <Badge key={skill} variant="secondary" className="px-3 py-1">
-                            {skill}
-                            <button 
-                              className="ml-2 text-gray-500 hover:text-red-500"
-                              onClick={() => removeSkill(skill)}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        {/* Professional Summary Section */}
+                        {section.id === 'summary' && (
+                          <div className="space-y-4">
+                            <Textarea
+                              placeholder="Write a compelling professional summary that highlights your key achievements and career goals..."
+                              className="min-h-[120px]"
+                              value={resumeData.professionalSummary}
+                              onChange={(e) => updateProfessionalSummary(e.target.value)}
+                            />
+                          </div>
+                        )}
 
-                  {/* Certifications Section */}
-                  {activeSection === 'certifications' && (
-                    <div className="space-y-4">
-                      <div className="flex space-x-2">
-                        <Input 
-                          placeholder="Add a certification" 
-                          value={currentCertification}
-                          onChange={(e) => setCurrentCertification(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              addCertification(currentCertification);
-                            }
-                          }}
-                        />
-                        <Button onClick={() => addCertification(currentCertification)}>
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <div className="space-y-2">
-                        {resumeData.certifications.map((cert) => (
-                          <div key={cert} className="flex items-center justify-between p-3 border rounded-lg">
-                            <span>{cert}</span>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => removeCertification(cert)}
-                            >
-                              <Trash2 className="w-4 h-4" />
+                        {/* Education Section */}
+                        {section.id === 'education' && (
+                          <div className="space-y-4">
+                            {resumeData.education.map((edu) => (
+                              <Card key={edu.id} className="border-gray-200">
+                                <CardContent className="pt-4">
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <Label>School/University</Label>
+                                        <Input 
+                                          placeholder="University of California" 
+                                          value={edu.school}
+                                          onChange={(e) => updateEducation(edu.id, 'school', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Degree</Label>
+                                        <Input 
+                                          placeholder="Bachelor of Science" 
+                                          value={edu.degree}
+                                          onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Field of Study</Label>
+                                        <Input 
+                                          placeholder="Computer Science" 
+                                          value={edu.field}
+                                          onChange={(e) => updateEducation(edu.id, 'field', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>GPA (Optional)</Label>
+                                        <Input 
+                                          placeholder="3.8" 
+                                          value={edu.gpa}
+                                          onChange={(e) => updateEducation(edu.id, 'gpa', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Start Date</Label>
+                                        <Input 
+                                          type="month" 
+                                          value={edu.startDate}
+                                          onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>End Date</Label>
+                                        <Input 
+                                          type="month" 
+                                          value={edu.endDate}
+                                          onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)}
+                                        />
+                                      </div>
+                                    </div>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm" 
+                                      className="w-fit"
+                                      onClick={() => removeEducation(edu.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Remove
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                            <Button onClick={addEducation} variant="outline" className="w-full">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Education
                             </Button>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                        )}
 
-                  {/* Projects Section */}
-                  {activeSection === 'projects' && (
-                    <div className="space-y-4">
-                      {resumeData.projects.map((project) => (
-                        <Card key={project.id} className="border-gray-200">
-                          <CardContent className="pt-4">
-                            <div className="space-y-3">
-                              <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                  <Label>Project Name</Label>
-                                  <Input 
-                                    placeholder="E-commerce Website" 
-                                    value={project.name}
-                                    onChange={(e) => updateProject(project.id, 'name', e.target.value)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Technologies Used</Label>
-                                  <Input 
-                                    placeholder="React, Node.js, MongoDB" 
-                                    value={project.technologies}
-                                    onChange={(e) => updateProject(project.id, 'technologies', e.target.value)}
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <Label>Description</Label>
-                                <Textarea 
-                                  placeholder="Describe the project, your role, and key achievements..."
-                                  className="min-h-[80px]"
-                                  value={project.description}
-                                  onChange={(e) => updateProject(project.id, 'description', e.target.value)}
-                                />
-                              </div>
-                              <div>
-                                <Label>Project Link (Optional)</Label>
-                                <Input 
-                                  placeholder="https://github.com/username/project" 
-                                  value={project.link}
-                                  onChange={(e) => updateProject(project.id, 'link', e.target.value)}
-                                />
-                              </div>
-                              <Button 
-                                variant="destructive" 
-                                size="sm" 
-                                className="w-fit"
-                                onClick={() => removeProject(project.id)}
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Remove
+                        {/* Work Experience Section */}
+                        {section.id === 'experience' && (
+                          <div className="space-y-4">
+                            {resumeData.workExperience.map((work) => (
+                              <Card key={work.id} className="border-gray-200">
+                                <CardContent className="pt-4">
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <Label>Company</Label>
+                                        <Input 
+                                          placeholder="Tech Corp" 
+                                          value={work.company}
+                                          onChange={(e) => updateWorkExperience(work.id, 'company', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Position</Label>
+                                        <Input 
+                                          placeholder="Software Engineer" 
+                                          value={work.position}
+                                          onChange={(e) => updateWorkExperience(work.id, 'position', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Start Date</Label>
+                                        <Input 
+                                          type="month" 
+                                          value={work.startDate}
+                                          onChange={(e) => updateWorkExperience(work.id, 'startDate', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>End Date</Label>
+                                        <Input 
+                                          type="month" 
+                                          value={work.endDate}
+                                          onChange={(e) => updateWorkExperience(work.id, 'endDate', e.target.value)}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <Label className="flex items-center justify-between">
+                                        Job Description
+                                        <Button 
+                                          size="sm" 
+                                          className="bg-orange-500 hover:bg-orange-600 text-white h-7 px-3 text-xs"
+                                        >
+                                          <Sparkles className="w-3 h-3 mr-1" />
+                                          AI Suggest
+                                        </Button>
+                                      </Label>
+                                      <Textarea 
+                                        placeholder="Describe your key responsibilities and achievements..."
+                                        className="min-h-[100px]"
+                                        value={work.description}
+                                        onChange={(e) => updateWorkExperience(work.id, 'description', e.target.value)}
+                                      />
+                                    </div>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm" 
+                                      className="w-fit"
+                                      onClick={() => removeWorkExperience(work.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Remove
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                            <Button onClick={addWorkExperience} variant="outline" className="w-full">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Work Experience
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Skills Section */}
+                        {section.id === 'skills' && (
+                          <div className="space-y-4">
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="Add a skill" 
+                                value={currentSkill}
+                                onChange={(e) => setCurrentSkill(e.target.value)}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    addSkill(currentSkill);
+                                  }
+                                }}
+                              />
+                              <Button onClick={() => addSkill(currentSkill)}>
+                                <Plus className="w-4 h-4" />
                               </Button>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      <Button onClick={addProject} variant="outline" className="w-full">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Project
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+                            <div className="flex flex-wrap gap-2">
+                              {resumeData.skills.map((skill) => (
+                                <Badge key={skill} variant="secondary" className="px-3 py-1">
+                                  {skill}
+                                  <button 
+                                    className="ml-2 text-gray-500 hover:text-red-500"
+                                    onClick={() => removeSkill(skill)}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Certifications Section */}
+                        {section.id === 'certifications' && (
+                          <div className="space-y-4">
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="Add a certification" 
+                                value={currentCertification}
+                                onChange={(e) => setCurrentCertification(e.target.value)}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    addCertification(currentCertification);
+                                  }
+                                }}
+                              />
+                              <Button onClick={() => addCertification(currentCertification)}>
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              {resumeData.certifications.map((cert) => (
+                                <div key={cert} className="flex items-center justify-between p-3 border rounded-lg">
+                                  <span>{cert}</span>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => removeCertification(cert)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Projects Section */}
+                        {section.id === 'projects' && (
+                          <div className="space-y-4">
+                            {resumeData.projects.map((project) => (
+                              <Card key={project.id} className="border-gray-200">
+                                <CardContent className="pt-4">
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <Label>Project Name</Label>
+                                        <Input 
+                                          placeholder="E-commerce Website" 
+                                          value={project.name}
+                                          onChange={(e) => updateProject(project.id, 'name', e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <Label>Technologies Used</Label>
+                                        <Input 
+                                          placeholder="React, Node.js, MongoDB" 
+                                          value={project.technologies}
+                                          onChange={(e) => updateProject(project.id, 'technologies', e.target.value)}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <Label>Description</Label>
+                                      <Textarea 
+                                        placeholder="Describe the project, your role, and key achievements..."
+                                        className="min-h-[80px]"
+                                        value={project.description}
+                                        onChange={(e) => updateProject(project.id, 'description', e.target.value)}
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label>Project Link (Optional)</Label>
+                                      <Input 
+                                        placeholder="https://github.com/username/project" 
+                                        value={project.link}
+                                        onChange={(e) => updateProject(project.id, 'link', e.target.value)}
+                                      />
+                                    </div>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm" 
+                                      className="w-fit"
+                                      onClick={() => removeProject(project.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-1" />
+                                      Remove
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                            <Button onClick={addProject} variant="outline" className="w-full">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Project
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              );
+            })}
           </div>
 
           {/* Right Panel - Preview */}
@@ -945,22 +947,26 @@ export default function ResumeBuilder() {
                         )}
                         <div className="flex-1">
                           <h1 className="text-3xl font-bold">
-                            {resumeData.personalInfo.fullName || 'Your Name'}
+                            {resumeData.personalInfo.fullName || 'Jashwanth Sheri'}
                           </h1>
                           <p className="text-lg opacity-90 mt-1">
-                            {resumeData.workExperience[0]?.position || 'Your Title'}
+                            {resumeData.workExperience[0]?.position || 'Software Developer'}
                           </p>
                           <div className="flex flex-wrap items-center space-x-4 text-sm mt-3 opacity-90">
-                            {resumeData.personalInfo.email && <span>{resumeData.personalInfo.email}</span>}
-                            {resumeData.personalInfo.phone && <span>{resumeData.personalInfo.phone}</span>}
-                            {resumeData.personalInfo.location && <span>{resumeData.personalInfo.location}</span>}
+                            <span>{resumeData.personalInfo.email || 'jashwanthsheri68@gmail.com'}</span>
+                            <span>{resumeData.personalInfo.phone || '9010449268'}</span>
+                            <span>{resumeData.personalInfo.location || 'Hyderabad'}</span>
                           </div>
                           <div className="flex flex-wrap items-center space-x-4 text-sm mt-1 opacity-90">
-                            {resumeData.personalInfo.linkedin && (
-                              <span>LinkedIn: {resumeData.personalInfo.linkedin}</span>
-                            )}
-                            {resumeData.personalInfo.website && (
-                              <span>Website: {resumeData.personalInfo.website}</span>
+                            {(resumeData.personalInfo.linkedin || resumeData.personalInfo.website) && (
+                              <>
+                                {resumeData.personalInfo.linkedin && (
+                                  <span>LinkedIn: {resumeData.personalInfo.linkedin}</span>
+                                )}
+                                {resumeData.personalInfo.website && (
+                                  <span>Website: {resumeData.personalInfo.website}</span>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
@@ -997,16 +1003,16 @@ export default function ResumeBuilder() {
                                     <div className="flex justify-between items-start mb-2">
                                       <div>
                                         <h3 className="font-semibold text-gray-900">
-                                          {work.position || 'Position'}
+                                          {work.position || 'Software Developer Intern'}
                                         </h3>
                                         <p className={`${currentTemplate.accent} font-medium`}>
-                                          {work.company || 'Company'}
+                                          {work.company || 'Company Name'}
                                         </p>
                                       </div>
                                       <span className="text-gray-500 text-sm">
                                         {work.startDate && work.endDate 
                                           ? `${work.startDate} - ${work.endDate}`
-                                          : work.startDate || work.endDate || 'Present'
+                                          : work.startDate || work.endDate || '2023-08 - Present'
                                         }
                                       </span>
                                     </div>
