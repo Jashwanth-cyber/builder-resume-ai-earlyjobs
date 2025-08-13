@@ -19,6 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import ATSScoreCard from "@/components/ui/ats-score";
 import {
   ArrowLeft,
   FileText,
