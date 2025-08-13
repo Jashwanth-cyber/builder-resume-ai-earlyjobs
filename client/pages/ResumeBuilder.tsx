@@ -160,7 +160,7 @@ export default function ResumeBuilder() {
   const [activeTemplate, setActiveTemplate] = useState("modern");
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const [isReorderMode, setIsReorderMode] = useState(false);
-  const [viewMode, setViewMode] = useState<'preview' | 'ats'>('preview');
+  const [viewMode, setViewMode] = useState<"preview" | "ats">("preview");
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -454,10 +454,10 @@ export default function ResumeBuilder() {
 
     setATSLoading(true);
     try {
-      const response = await fetch('/api/ats/analyze', {
-        method: 'POST',
+      const response = await fetch("/api/ats/analyze", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           personalInfo: resumeData.personalInfo,
@@ -468,7 +468,7 @@ export default function ResumeBuilder() {
           certifications: resumeData.certifications,
           projects: resumeData.projects,
           template: activeTemplate,
-          sectionOrder
+          sectionOrder,
         }),
       });
 
@@ -480,10 +480,10 @@ export default function ResumeBuilder() {
       if (result.success) {
         setATSScore(result.data.atsScore);
       } else {
-        throw new Error(result.message || 'Analysis failed');
+        throw new Error(result.message || "Analysis failed");
       }
     } catch (error) {
-      console.error('Error analyzing ATS score:', error);
+      console.error("Error analyzing ATS score:", error);
       // Reset ATS score on error
       setATSScore(null);
     } finally {
@@ -507,16 +507,19 @@ export default function ResumeBuilder() {
         projects: resumeData.projects,
         profilePicture: resumeData.profilePicture,
         template: activeTemplate,
-        sectionOrder
+        sectionOrder,
       };
 
-      const response = await fetch(savedResumeId ? `/api/resumes/${savedResumeId}` : '/api/resumes', {
-        method: savedResumeId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        savedResumeId ? `/api/resumes/${savedResumeId}` : "/api/resumes",
+        {
+          method: savedResumeId ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(resumePayload),
         },
-        body: JSON.stringify(resumePayload),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -529,10 +532,10 @@ export default function ResumeBuilder() {
           setATSScore(result.data.atsScore);
         }
       } else {
-        throw new Error(result.message || 'Save failed');
+        throw new Error(result.message || "Save failed");
       }
     } catch (error) {
-      console.error('Error saving resume:', error);
+      console.error("Error saving resume:", error);
     } finally {
       setIsSaving(false);
     }
@@ -559,33 +562,33 @@ export default function ResumeBuilder() {
 
     try {
       // Import html2pdf dynamically
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2pdf = (await import("html2pdf.js")).default;
 
       // Configure PDF options
       const options = {
         margin: 0.5,
-        filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
+        filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
         html2canvas: {
           scale: 2,
           useCORS: true,
           letterRendering: true,
           scrollX: 0,
-          scrollY: 0
+          scrollY: 0,
         },
         jsPDF: {
-          unit: 'in',
-          format: 'a4',
-          orientation: 'portrait',
-          compress: true
-        }
+          unit: "in",
+          format: "a4",
+          orientation: "portrait",
+          compress: true,
+        },
       };
 
       // Generate and download PDF
       await html2pdf().set(options).from(element).save();
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
     }
   }, [resumeData.personalInfo.fullName]);
 
@@ -901,7 +904,9 @@ export default function ResumeBuilder() {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <Sparkles className="w-3 h-3 md:mr-1" />
-                                <span className="hidden md:inline">AI Suggest</span>
+                                <span className="hidden md:inline">
+                                  AI Suggest
+                                </span>
                               </Button>
                             )}
                             {isCollapsed ? (
@@ -950,7 +955,12 @@ export default function ResumeBuilder() {
                             <Separator />
                             <div className="grid grid-cols-1 gap-3">
                               <div>
-                                <Label htmlFor="fullName" className="text-sm font-medium">Full Name *</Label>
+                                <Label
+                                  htmlFor="fullName"
+                                  className="text-sm font-medium"
+                                >
+                                  Full Name *
+                                </Label>
                                 <Input
                                   id="fullName"
                                   placeholder="Jashwanth Sheri"
@@ -965,7 +975,12 @@ export default function ResumeBuilder() {
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
+                                <Label
+                                  htmlFor="email"
+                                  className="text-sm font-medium"
+                                >
+                                  Email Address *
+                                </Label>
                                 <Input
                                   id="email"
                                   type="email"
@@ -1308,9 +1323,14 @@ export default function ResumeBuilder() {
                                 }}
                                 className="flex-1"
                               />
-                              <Button onClick={() => addSkill(currentSkill)} className="w-full sm:w-auto">
+                              <Button
+                                onClick={() => addSkill(currentSkill)}
+                                className="w-full sm:w-auto"
+                              >
                                 <Plus className="w-4 h-4 sm:mr-0" />
-                                <span className="ml-2 sm:hidden">Add Skill</span>
+                                <span className="ml-2 sm:hidden">
+                                  Add Skill
+                                </span>
                               </Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -1357,7 +1377,9 @@ export default function ResumeBuilder() {
                                 className="w-full sm:w-auto"
                               >
                                 <Plus className="w-4 h-4 sm:mr-0" />
-                                <span className="ml-2 sm:hidden">Add Certification</span>
+                                <span className="ml-2 sm:hidden">
+                                  Add Certification
+                                </span>
                               </Button>
                             </div>
                             <div className="space-y-2">
@@ -1486,24 +1508,24 @@ export default function ResumeBuilder() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <h2 className="text-lg font-semibold">
-                  {viewMode === 'preview' ? 'Resume Preview' : 'ATS Analysis'}
+                  {viewMode === "preview" ? "Resume Preview" : "ATS Analysis"}
                 </h2>
 
                 {/* View Toggle */}
                 <div className="flex items-center bg-gray-100 rounded-lg p-1">
                   <Button
-                    variant={viewMode === 'preview' ? 'default' : 'ghost'}
+                    variant={viewMode === "preview" ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => setViewMode('preview')}
+                    onClick={() => setViewMode("preview")}
                     className="h-7 md:h-8 px-2 md:px-3 text-xs"
                   >
                     <Eye className="w-3 h-3 md:mr-1" />
                     <span className="hidden sm:inline">Preview</span>
                   </Button>
                   <Button
-                    variant={viewMode === 'ats' ? 'default' : 'ghost'}
+                    variant={viewMode === "ats" ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => setViewMode('ats')}
+                    onClick={() => setViewMode("ats")}
                     className="h-7 md:h-8 px-2 md:px-3 text-xs"
                   >
                     <Target className="w-3 h-3 md:mr-1" />
@@ -1557,7 +1579,7 @@ export default function ResumeBuilder() {
                     </div>
                   </DialogContent>
                 </Dialog>
-                {viewMode === 'preview' && (
+                {viewMode === "preview" && (
                   <Button
                     variant={isReorderMode ? "default" : "outline"}
                     size="sm"
@@ -1590,143 +1612,150 @@ export default function ResumeBuilder() {
             )}
 
             {/* ATS Score Analysis */}
-            {viewMode === 'ats' && (
+            {viewMode === "ats" && (
               <ATSScoreCard
-                score={atsScore || {
-                  totalScore: 0,
-                  contactInfoScore: 0,
-                  keywordsScore: 0,
-                  formatScore: 0,
-                  experienceScore: 0,
-                  skillsScore: 0,
-                  suggestions: ['Start building your resume to see ATS analysis'],
-                  lastUpdated: new Date()
-                }}
+                score={
+                  atsScore || {
+                    totalScore: 0,
+                    contactInfoScore: 0,
+                    keywordsScore: 0,
+                    formatScore: 0,
+                    experienceScore: 0,
+                    skillsScore: 0,
+                    suggestions: [
+                      "Start building your resume to see ATS analysis",
+                    ],
+                    lastUpdated: new Date(),
+                  }
+                }
                 loading={atsLoading}
                 onAnalyze={analyzeATS}
                 onViewSuggestions={() => {
                   // Could open a detailed suggestions modal
-                  alert('Detailed suggestions modal would open here');
+                  alert("Detailed suggestions modal would open here");
                 }}
               />
             )}
 
             {/* Live Preview */}
-            {viewMode === 'preview' && (
-            <Card>
-              <CardContent className="p-0">
-                <div
-                  id="resume-preview"
-                  className="bg-white rounded-lg min-h-[700px] shadow-sm overflow-hidden"
-                >
-                  {/* Resume Preview Content with Live Updates */}
-                  <div className="space-y-6">
-                    {/* Header - Always at top, not draggable */}
-                    <div
-                      className={`${currentTemplate.headerBg} ${currentTemplate.headerText} p-6`}
-                    >
-                      <div className="flex items-center space-x-4">
-                        {resumeData.profilePicture && (
-                          <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0">
-                            <img
-                              src={resumeData.profilePicture}
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <h1 className="text-3xl font-bold">
-                            {resumeData.personalInfo.fullName ||
-                              "Jashwanth Sheri"}
-                          </h1>
-                          <p className="text-lg opacity-90 mt-1">
-                            {resumeData.workExperience[0]?.position ||
-                              "Software Developer"}
-                          </p>
-                          <div className="flex flex-wrap items-center space-x-4 text-sm mt-3 opacity-90">
-                            <span>
-                              {resumeData.personalInfo.email ||
-                                "jashwanthsheri68@gmail.com"}
-                            </span>
-                            <span>
-                              {resumeData.personalInfo.phone || "9010449268"}
-                            </span>
-                            <span>
-                              {resumeData.personalInfo.location || "Hyderabad"}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap items-center space-x-4 text-sm mt-1 opacity-90">
-                            {resumeData.personalInfo.linkedin && (
-                              <span>
-                                <strong>LinkedIn:</strong>{" "}
-                                {resumeData.personalInfo.linkedin}
-                              </span>
-                            )}
-                            {resumeData.personalInfo.website && (
-                              <span>
-                                <strong>Website:</strong>{" "}
-                                {resumeData.personalInfo.website}
-                              </span>
-                            )}
-                          </div>
-                          {resumeData.personalInfo.github && (
-                            <div className="text-sm mt-1 opacity-90">
-                              <span>
-                                <strong>GitHub:</strong>{" "}
-                                {resumeData.personalInfo.github}
-                              </span>
+            {viewMode === "preview" && (
+              <Card>
+                <CardContent className="p-0">
+                  <div
+                    id="resume-preview"
+                    className="bg-white rounded-lg min-h-[700px] shadow-sm overflow-hidden"
+                  >
+                    {/* Resume Preview Content with Live Updates */}
+                    <div className="space-y-6">
+                      {/* Header - Always at top, not draggable */}
+                      <div
+                        className={`${currentTemplate.headerBg} ${currentTemplate.headerText} p-6`}
+                      >
+                        <div className="flex items-center space-x-4">
+                          {resumeData.profilePicture && (
+                            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0">
+                              <img
+                                src={resumeData.profilePicture}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           )}
+                          <div className="flex-1">
+                            <h1 className="text-3xl font-bold">
+                              {resumeData.personalInfo.fullName ||
+                                "Jashwanth Sheri"}
+                            </h1>
+                            <p className="text-lg opacity-90 mt-1">
+                              {resumeData.workExperience[0]?.position ||
+                                "Software Developer"}
+                            </p>
+                            <div className="flex flex-wrap items-center space-x-4 text-sm mt-3 opacity-90">
+                              <span>
+                                {resumeData.personalInfo.email ||
+                                  "jashwanthsheri68@gmail.com"}
+                              </span>
+                              <span>
+                                {resumeData.personalInfo.phone || "9010449268"}
+                              </span>
+                              <span>
+                                {resumeData.personalInfo.location ||
+                                  "Hyderabad"}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap items-center space-x-4 text-sm mt-1 opacity-90">
+                              {resumeData.personalInfo.linkedin && (
+                                <span>
+                                  <strong>LinkedIn:</strong>{" "}
+                                  {resumeData.personalInfo.linkedin}
+                                </span>
+                              )}
+                              {resumeData.personalInfo.website && (
+                                <span>
+                                  <strong>Website:</strong>{" "}
+                                  {resumeData.personalInfo.website}
+                                </span>
+                              )}
+                            </div>
+                            {resumeData.personalInfo.github && (
+                              <div className="text-sm mt-1 opacity-90">
+                                <span>
+                                  <strong>GitHub:</strong>{" "}
+                                  {resumeData.personalInfo.github}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="px-6 pb-6 space-y-6">
-                      {/* Dynamic Sections - Draggable in reorder mode */}
-                      {sectionOrder
-                        .filter((section) => section.visible)
-                        .map((sectionConfig, index) => {
-                          const content = renderSectionContent(sectionConfig);
-                          if (!content) return null;
+                      <div className="px-6 pb-6 space-y-6">
+                        {/* Dynamic Sections - Draggable in reorder mode */}
+                        {sectionOrder
+                          .filter((section) => section.visible)
+                          .map((sectionConfig, index) => {
+                            const content = renderSectionContent(sectionConfig);
+                            if (!content) return null;
 
-                          if (isReorderMode) {
-                            return (
-                              <div
-                                key={sectionConfig.id}
-                                draggable
-                                onDragStart={(e) =>
-                                  handleDragStart(e, sectionConfig.id)
-                                }
-                                onDragOver={handleDragOver}
-                                onDrop={(e) => handleDrop(e, sectionConfig.id)}
-                                onDragEnd={handleDragEnd}
-                                className={`border-2 border-dashed border-orange-300 rounded-lg p-4 cursor-move transition-all hover:border-orange-400 hover:shadow-md ${
-                                  draggedSection === sectionConfig.id
-                                    ? "opacity-50"
-                                    : "opacity-100"
-                                }`}
-                              >
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="flex items-center space-x-2">
-                                    <GripVertical className="w-4 h-4 text-orange-500" />
-                                    <span className="text-sm font-medium text-orange-700">
-                                      Drag to reorder: {sectionConfig.name}
-                                    </span>
+                            if (isReorderMode) {
+                              return (
+                                <div
+                                  key={sectionConfig.id}
+                                  draggable
+                                  onDragStart={(e) =>
+                                    handleDragStart(e, sectionConfig.id)
+                                  }
+                                  onDragOver={handleDragOver}
+                                  onDrop={(e) =>
+                                    handleDrop(e, sectionConfig.id)
+                                  }
+                                  onDragEnd={handleDragEnd}
+                                  className={`border-2 border-dashed border-orange-300 rounded-lg p-4 cursor-move transition-all hover:border-orange-400 hover:shadow-md ${
+                                    draggedSection === sectionConfig.id
+                                      ? "opacity-50"
+                                      : "opacity-100"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center space-x-2">
+                                      <GripVertical className="w-4 h-4 text-orange-500" />
+                                      <span className="text-sm font-medium text-orange-700">
+                                        Drag to reorder: {sectionConfig.name}
+                                      </span>
+                                    </div>
                                   </div>
+                                  {content}
                                 </div>
-                                {content}
-                              </div>
-                            );
-                          }
+                              );
+                            }
 
-                          return content;
-                        })}
+                            return content;
+                          })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>

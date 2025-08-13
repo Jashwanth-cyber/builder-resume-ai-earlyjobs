@@ -8,8 +8,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, Plus, FileText, Sparkles, Download, Zap, Briefcase, Lightbulb } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Upload,
+  Plus,
+  FileText,
+  Sparkles,
+  Download,
+  Zap,
+  Briefcase,
+  Lightbulb,
+} from "lucide-react";
 
 export default function Index() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -30,7 +45,9 @@ export default function Index() {
             </div>
             <div className="flex items-center space-x-2 text-xs md:text-sm text-gray-600">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">AI-Powered Resume Builder</span>
+              <span className="hidden sm:inline">
+                AI-Powered Resume Builder
+              </span>
               <span className="sm:hidden">AI-Powered</span>
             </div>
           </div>
@@ -109,7 +126,10 @@ export default function Index() {
           </Card>
 
           {/* Create New Resume Card with Dialog */}
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
             <DialogTrigger asChild>
               <Card className="relative overflow-hidden border-0 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 group cursor-pointer">
                 <CardHeader className="text-center pb-4">
@@ -168,8 +188,12 @@ export default function Index() {
                           <Briefcase className="w-6 h-6 text-orange-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">Job Description Enhanced (JDE)</h3>
-                          <p className="text-sm text-gray-600">AI-optimized for specific job descriptions</p>
+                          <h3 className="font-semibold text-gray-900">
+                            Job Description Enhanced (JDE)
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            AI-optimized for specific job descriptions
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -185,8 +209,12 @@ export default function Index() {
                           <FileText className="w-6 h-6 text-gray-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">Standard Resume</h3>
-                          <p className="text-sm text-gray-600">General purpose resume template</p>
+                          <h3 className="font-semibold text-gray-900">
+                            Standard Resume
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            General purpose resume template
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -202,8 +230,12 @@ export default function Index() {
                           <Lightbulb className="w-6 h-6 text-purple-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">AI-Enhanced Resume</h3>
-                          <p className="text-sm text-gray-600">Maximum AI assistance and optimization</p>
+                          <h3 className="font-semibold text-gray-900">
+                            AI-Enhanced Resume
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Maximum AI assistance and optimization
+                          </p>
                         </div>
                       </div>
                     </CardContent>

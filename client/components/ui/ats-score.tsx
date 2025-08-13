@@ -1,17 +1,17 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { Progress } from './progress';
-import { Badge } from './badge';
-import { Button } from './button';
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  XCircle, 
-  Target, 
-  TrendingUp, 
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Progress } from "./progress";
+import { Badge } from "./badge";
+import { Button } from "./button";
+import {
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Target,
+  TrendingUp,
   Eye,
-  Lightbulb
-} from 'lucide-react';
+  Lightbulb,
+} from "lucide-react";
 
 interface ATSScore {
   totalScore: number;
@@ -31,11 +31,16 @@ interface ATSScoreProps {
   loading?: boolean;
 }
 
-export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = false }: ATSScoreProps) {
+export function ATSScoreCard({
+  score,
+  onViewSuggestions,
+  onAnalyze,
+  loading = false,
+}: ATSScoreProps) {
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-orange-600';
-    return 'text-red-600';
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-orange-600";
+    return "text-red-600";
   };
 
   const getScoreIcon = (score: number) => {
@@ -45,11 +50,11 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return 'Excellent';
-    if (score >= 80) return 'Very Good';
-    if (score >= 70) return 'Good';
-    if (score >= 60) return 'Fair';
-    return 'Needs Improvement';
+    if (score >= 90) return "Excellent";
+    if (score >= 80) return "Very Good";
+    if (score >= 70) return "Good";
+    if (score >= 60) return "Fair";
+    return "Needs Improvement";
   };
 
   if (loading) {
@@ -79,9 +84,9 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
             <Target className="w-5 h-5 mr-2" />
             ATS Score Analysis
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onAnalyze}
             className="border-orange-300 text-orange-700 hover:bg-orange-100"
           >
@@ -95,13 +100,15 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
         <div className="text-center">
           <div className="flex items-center justify-center mb-2">
             {getScoreIcon(score.totalScore)}
-            <span className={`ml-2 text-3xl font-bold ${getScoreColor(score.totalScore)}`}>
+            <span
+              className={`ml-2 text-3xl font-bold ${getScoreColor(score.totalScore)}`}
+            >
               {score.totalScore}
             </span>
             <span className="text-gray-500 text-lg ml-1">/100</span>
           </div>
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className={`${getScoreColor(score.totalScore)} bg-white`}
           >
             {getScoreLabel(score.totalScore)}
@@ -114,59 +121,79 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
         {/* Score Breakdown */}
         <div className="space-y-4">
           <h4 className="font-medium text-gray-800">Score Breakdown</h4>
-          
+
           <div className="space-y-3">
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Contact Information</span>
-                <span className="text-sm text-gray-600">{score.contactInfoScore}/20</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Contact Information
+                </span>
+                <span className="text-sm text-gray-600">
+                  {score.contactInfoScore}/20
+                </span>
               </div>
-              <Progress 
-                value={(score.contactInfoScore / 20) * 100} 
+              <Progress
+                value={(score.contactInfoScore / 20) * 100}
                 className="h-2"
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Keywords & Skills</span>
-                <span className="text-sm text-gray-600">{score.keywordsScore}/25</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Keywords & Skills
+                </span>
+                <span className="text-sm text-gray-600">
+                  {score.keywordsScore}/25
+                </span>
               </div>
-              <Progress 
-                value={(score.keywordsScore / 25) * 100} 
+              <Progress
+                value={(score.keywordsScore / 25) * 100}
                 className="h-2"
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Format & Structure</span>
-                <span className="text-sm text-gray-600">{score.formatScore}/20</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Format & Structure
+                </span>
+                <span className="text-sm text-gray-600">
+                  {score.formatScore}/20
+                </span>
               </div>
-              <Progress 
-                value={(score.formatScore / 20) * 100} 
+              <Progress
+                value={(score.formatScore / 20) * 100}
                 className="h-2"
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Experience Details</span>
-                <span className="text-sm text-gray-600">{score.experienceScore}/20</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Experience Details
+                </span>
+                <span className="text-sm text-gray-600">
+                  {score.experienceScore}/20
+                </span>
               </div>
-              <Progress 
-                value={(score.experienceScore / 20) * 100} 
+              <Progress
+                value={(score.experienceScore / 20) * 100}
                 className="h-2"
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">Skills Variety</span>
-                <span className="text-sm text-gray-600">{score.skillsScore}/15</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Skills Variety
+                </span>
+                <span className="text-sm text-gray-600">
+                  {score.skillsScore}/15
+                </span>
               </div>
-              <Progress 
-                value={(score.skillsScore / 15) * 100} 
+              <Progress
+                value={(score.skillsScore / 15) * 100}
                 className="h-2"
               />
             </div>
@@ -189,9 +216,9 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
               ))}
             </div>
             {score.suggestions.length > 3 && onViewSuggestions && (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={onViewSuggestions}
                 className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
               >
@@ -206,7 +233,9 @@ export function ATSScoreCard({ score, onViewSuggestions, onAnalyze, loading = fa
         <div className="bg-white rounded-lg p-4 border border-orange-200">
           <h5 className="font-medium text-gray-800 mb-2">💡 ATS Tips</h5>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>• Use standard section headers (Experience, Education, Skills)</li>
+            <li>
+              • Use standard section headers (Experience, Education, Skills)
+            </li>
             <li>• Include keywords from the job description</li>
             <li>• Use a simple, clean format without graphics</li>
             <li>• Save as PDF to preserve formatting</li>

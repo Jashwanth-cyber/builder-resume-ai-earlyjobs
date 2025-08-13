@@ -10,12 +10,12 @@ import {
   deleteResume,
   getATSScore,
   duplicateResume,
-  searchResumes
+  searchResumes,
 } from "./routes/resumes";
 import {
   analyzeResume,
   getIndustryKeywords,
-  suggestImprovements
+  suggestImprovements,
 } from "./routes/ats";
 
 export function createServer() {

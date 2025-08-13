@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
@@ -9,7 +9,7 @@ export interface IUser extends Document {
   avatar?: string;
   resumes: mongoose.Types.ObjectId[];
   subscription: {
-    type: 'free' | 'premium' | 'enterprise';
+    type: "free" | "premium" | "enterprise";
     startDate?: Date;
     endDate?: Date;
     features: string[];
@@ -23,153 +23,162 @@ export interface IUser extends Document {
   updatedAt: Date;
 }
 
-const UserSchema = new Schema<IUser>({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-    validate: {
-      validator: function(v: string) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const UserSchema = new Schema<IUser>(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      validate: {
+        validator: function (v: string) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: "Invalid email format",
       },
-      message: 'Invalid email format'
-    }
-  },
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 100
-  },
-  hashedPassword: {
-    type: String,
-    select: false // Don't include password in queries by default
-  },
-  provider: {
-    type: String,
-    enum: ['local', 'google', 'linkedin', 'github'],
-    default: 'local'
-  },
-  providerId: {
-    type: String,
-    sparse: true // Allow null but ensure uniqueness when present
-  },
-  avatar: {
-    type: String,
-    trim: true
-  },
-  resumes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Resume'
-  }],
-  subscription: {
-    type: {
-      type: String,
-      enum: ['free', 'premium', 'enterprise'],
-      default: 'free'
     },
-    startDate: Date,
-    endDate: Date,
-    features: [{
+    name: {
       type: String,
-      enum: [
-        'unlimited_resumes',
-        'premium_templates',
-        'ats_score',
-        'download_pdf',
-        'cover_letter',
-        'linkedin_import',
-        'priority_support'
-      ]
-    }]
-  },
-  preferences: {
-    defaultTemplate: {
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
+    hashedPassword: {
       type: String,
-      default: 'modern',
-      enum: ['modern', 'classic', 'creative', 'minimal', 'professional']
+      select: false, // Don't include password in queries by default
     },
-    emailNotifications: {
-      type: Boolean,
-      default: true
+    provider: {
+      type: String,
+      enum: ["local", "google", "linkedin", "github"],
+      default: "local",
     },
-    shareAnalytics: {
-      type: Boolean,
-      default: false
-    }
-  }
-}, {
-  timestamps: true,
-  toJSON: { 
-    virtuals: true,
-    transform: function(doc, ret) {
-      delete ret.hashedPassword;
-      return ret;
-    }
+    providerId: {
+      type: String,
+      sparse: true, // Allow null but ensure uniqueness when present
+    },
+    avatar: {
+      type: String,
+      trim: true,
+    },
+    resumes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Resume",
+      },
+    ],
+    subscription: {
+      type: {
+        type: String,
+        enum: ["free", "premium", "enterprise"],
+        default: "free",
+      },
+      startDate: Date,
+      endDate: Date,
+      features: [
+        {
+          type: String,
+          enum: [
+            "unlimited_resumes",
+            "premium_templates",
+            "ats_score",
+            "download_pdf",
+            "cover_letter",
+            "linkedin_import",
+            "priority_support",
+          ],
+        },
+      ],
+    },
+    preferences: {
+      defaultTemplate: {
+        type: String,
+        default: "modern",
+        enum: ["modern", "classic", "creative", "minimal", "professional"],
+      },
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      shareAnalytics: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
-  toObject: { 
-    virtuals: true,
-    transform: function(doc, ret) {
-      delete ret.hashedPassword;
-      return ret;
-    }
-  }
-});
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        delete ret.hashedPassword;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        delete ret.hashedPassword;
+        return ret;
+      },
+    },
+  },
+);
 
 // Indexes
 UserSchema.index({ email: 1 });
 UserSchema.index({ provider: 1, providerId: 1 });
-UserSchema.index({ 'subscription.type': 1 });
+UserSchema.index({ "subscription.type": 1 });
 
 // Virtual for resume count
-UserSchema.virtual('resumeCount', {
-  ref: 'Resume',
-  localField: '_id',
-  foreignField: 'userId',
-  count: true
+UserSchema.virtual("resumeCount", {
+  ref: "Resume",
+  localField: "_id",
+  foreignField: "userId",
+  count: true,
 });
 
 // Method to check if user has premium features
-UserSchema.methods.hasPremiumFeature = function(feature: string): boolean {
-  return this.subscription.features.includes(feature) ||
-         this.subscription.type === 'premium' ||
-         this.subscription.type === 'enterprise';
+UserSchema.methods.hasPremiumFeature = function (feature: string): boolean {
+  return (
+    this.subscription.features.includes(feature) ||
+    this.subscription.type === "premium" ||
+    this.subscription.type === "enterprise"
+  );
 };
 
 // Method to check if subscription is active
-UserSchema.methods.isSubscriptionActive = function(): boolean {
-  if (this.subscription.type === 'free') return true;
+UserSchema.methods.isSubscriptionActive = function (): boolean {
+  if (this.subscription.type === "free") return true;
   if (!this.subscription.endDate) return false;
   return new Date() <= this.subscription.endDate;
 };
 
 // Set default features based on subscription type
-UserSchema.pre('save', function(next) {
-  if (this.isModified('subscription.type')) {
+UserSchema.pre("save", function (next) {
+  if (this.isModified("subscription.type")) {
     switch (this.subscription.type) {
-      case 'free':
-        this.subscription.features = ['download_pdf'];
+      case "free":
+        this.subscription.features = ["download_pdf"];
         break;
-      case 'premium':
+      case "premium":
         this.subscription.features = [
-          'unlimited_resumes',
-          'premium_templates',
-          'ats_score',
-          'download_pdf',
-          'cover_letter'
+          "unlimited_resumes",
+          "premium_templates",
+          "ats_score",
+          "download_pdf",
+          "cover_letter",
         ];
         break;
-      case 'enterprise':
+      case "enterprise":
         this.subscription.features = [
-          'unlimited_resumes',
-          'premium_templates',
-          'ats_score',
-          'download_pdf',
-          'cover_letter',
-          'linkedin_import',
-          'priority_support'
+          "unlimited_resumes",
+          "premium_templates",
+          "ats_score",
+          "download_pdf",
+          "cover_letter",
+          "linkedin_import",
+          "priority_support",
         ];
         break;
     }
@@ -177,4 +186,5 @@ UserSchema.pre('save', function(next) {
   next();
 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export default mongoose.models.User ||
+  mongoose.model<IUser>("User", UserSchema);
