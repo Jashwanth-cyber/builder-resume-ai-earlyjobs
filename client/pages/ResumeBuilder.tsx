@@ -999,7 +999,7 @@ export default function ResumeBuilder() {
                           <div className="space-y-4">
                             <Textarea
                               placeholder="Write a compelling professional summary that highlights your key achievements and career goals..."
-                              className="min-h-[120px]"
+                              className="min-h-[100px] md:min-h-[120px] text-sm"
                               value={resumeData.professionalSummary}
                               onChange={(e) =>
                                 updateProfessionalSummary(e.target.value)
