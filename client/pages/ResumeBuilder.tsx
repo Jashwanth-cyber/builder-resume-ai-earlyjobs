@@ -914,7 +914,7 @@ export default function ResumeBuilder() {
                                 />
                               </div>
                               <div>
-                                <Label htmlFor="email">Email Address *</Label>
+                                <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
                                 <Input
                                   id="email"
                                   type="email"
