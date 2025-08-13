@@ -491,7 +491,11 @@ export default function ResumeBuilder() {
   }, [resumeData, activeTemplate, sectionOrder, atsLoading]);
 
   // Save resume function
+  const [isSaving, setIsSaving] = useState(false);
   const saveResume = useCallback(async () => {
+    if (isSaving) return; // Prevent duplicate calls
+
+    setIsSaving(true);
     try {
       const resumePayload = {
         personalInfo: resumeData.personalInfo,
@@ -514,17 +518,25 @@ export default function ResumeBuilder() {
         body: JSON.stringify(resumePayload),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       if (result.success) {
         setSavedResumeId(result.data._id);
         if (result.data.atsScore) {
           setATSScore(result.data.atsScore);
         }
+      } else {
+        throw new Error(result.message || 'Save failed');
       }
     } catch (error) {
       console.error('Error saving resume:', error);
+    } finally {
+      setIsSaving(false);
     }
-  }, [resumeData, activeTemplate, sectionOrder, savedResumeId]);
+  }, [resumeData, activeTemplate, sectionOrder, savedResumeId, isSaving]);
 
   // Auto-save on data changes
   useEffect(() => {
