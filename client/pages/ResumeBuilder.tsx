@@ -824,33 +824,33 @@ export default function ResumeBuilder() {
                 >
                   <Card className="border-gray-200">
                     <CollapsibleTrigger asChild>
-                      <CardHeader className="cursor-pointer hover:bg-orange-50 hover:border-orange-200 transition-all duration-200 border border-transparent">
+                      <CardHeader className="cursor-pointer hover:bg-orange-50 hover:border-orange-200 transition-all duration-200 border border-transparent p-3 md:p-6">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-6 h-6 rounded flex items-center justify-center text-gray-600">
-                              <Icon className="w-5 h-5" />
+                          <div className="flex items-center space-x-2 md:space-x-3 min-w-0 flex-1">
+                            <div className="w-5 h-5 md:w-6 md:h-6 rounded flex items-center justify-center text-gray-600 flex-shrink-0">
+                              <Icon className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
-                            <span className="font-medium text-gray-800">
+                            <span className="font-medium text-gray-800 text-sm md:text-base truncate">
                               {section.name}
                             </span>
                             {section.required && (
                               <Badge
                                 variant="secondary"
-                                className="text-xs bg-orange-100 text-orange-700"
+                                className="text-xs bg-orange-100 text-orange-700 hidden sm:inline-flex"
                               >
                                 Required
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
                             {section.id === "experience" && (
                               <Button
                                 size="sm"
-                                className="bg-orange-500 hover:bg-orange-600 text-white h-7 px-3 text-xs"
+                                className="bg-orange-500 hover:bg-orange-600 text-white h-7 px-2 md:px-3 text-xs"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <Sparkles className="w-3 h-3 mr-1" />
-                                AI Suggest
+                                <Sparkles className="w-3 h-3 md:mr-1" />
+                                <span className="hidden md:inline">AI Suggest</span>
                               </Button>
                             )}
                             {isCollapsed ? (
@@ -864,7 +864,7 @@ export default function ResumeBuilder() {
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                      <CardContent className="pt-0 space-y-4">
+                      <CardContent className="pt-0 px-3 md:px-6 pb-3 md:pb-6 space-y-4">
                         {/* Personal Info Section */}
                         {section.id === "personal" && (
                           <div className="space-y-4">
