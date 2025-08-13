@@ -910,6 +910,7 @@ export default function ResumeBuilder() {
                                       e.target.value,
                                     )
                                   }
+                                  className="h-9 text-sm"
                                 />
                               </div>
                               <div>
