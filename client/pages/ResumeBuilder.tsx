@@ -1422,7 +1422,34 @@ export default function ResumeBuilder() {
           <div className="space-y-6 sticky top-24 h-fit">
             {/* Header Controls */}
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Resume Preview</h2>
+              <div className="flex items-center space-x-4">
+                <h2 className="text-lg font-semibold">
+                  {viewMode === 'preview' ? 'Resume Preview' : 'ATS Analysis'}
+                </h2>
+
+                {/* View Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <Button
+                    variant={viewMode === 'preview' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('preview')}
+                    className="h-8 px-3 text-xs"
+                  >
+                    <Eye className="w-3 h-3 mr-1" />
+                    Preview
+                  </Button>
+                  <Button
+                    variant={viewMode === 'ats' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('ats')}
+                    className="h-8 px-3 text-xs"
+                  >
+                    <Target className="w-3 h-3 mr-1" />
+                    ATS Score
+                  </Button>
+                </div>
+              </div>
+
               <div className="flex items-center space-x-2">
                 <Dialog
                   open={isTemplateDialogOpen}
