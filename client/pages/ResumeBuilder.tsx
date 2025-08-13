@@ -550,15 +550,44 @@ export default function ResumeBuilder() {
   }, [resumeData, saveResume]);
 
   // PDF Download function
-  const downloadPDF = useCallback(() => {
-    // In a real implementation, you would use a library like jsPDF or html2pdf
+  const downloadPDF = useCallback(async () => {
     const element = document.getElementById("resume-preview");
-    if (element) {
-      alert(
-        "PDF download functionality would be implemented here using html2pdf.js or similar library",
-      );
+    if (!element) {
+      alert("Resume preview not found");
+      return;
     }
-  }, []);
+
+    try {
+      // Import html2pdf dynamically
+      const html2pdf = (await import('html2pdf.js')).default;
+
+      // Configure PDF options
+      const options = {
+        margin: 0.5,
+        filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, '_')}_Resume.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          scrollX: 0,
+          scrollY: 0
+        },
+        jsPDF: {
+          unit: 'in',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: true
+        }
+      };
+
+      // Generate and download PDF
+      await html2pdf().set(options).from(element).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
+  }, [resumeData.personalInfo.fullName]);
 
   const sections = [
     {
