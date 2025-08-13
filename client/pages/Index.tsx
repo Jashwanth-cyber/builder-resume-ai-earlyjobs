@@ -8,7 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Upload, Plus, FileText, Sparkles, Download, Zap } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Upload, Plus, FileText, Sparkles, Download, Zap, Briefcase, Lightbulb } from "lucide-react";
 
 export default function Index() {
   return (
