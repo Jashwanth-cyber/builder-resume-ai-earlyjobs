@@ -770,36 +770,38 @@ export default function ResumeBuilder() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Home
+                <Button variant="ghost" size="sm" className="p-2 md:px-3">
+                  <ArrowLeft className="w-4 h-4 md:mr-2" />
+                  <span className="hidden md:inline">Back to Home</span>
                 </Button>
               </Link>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-white" />
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-lg md:text-xl font-bold text-gray-900 hidden sm:block">
                   AI Resume Builder
                 </h1>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm">
+            <div className="flex items-center space-x-1 md:space-x-3">
+              <Button variant="outline" size="sm" className="hidden md:flex">
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Resume
               </Button>
-              <Button variant="outline" size="sm">
-                Clear All
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                <RotateCcw className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Clear All</span>
               </Button>
               <Button
                 onClick={downloadPDF}
+                size="sm"
                 className="bg-green-500 hover:bg-green-600 text-white"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF
+                <Download className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Download PDF</span>
               </Button>
             </div>
           </div>
