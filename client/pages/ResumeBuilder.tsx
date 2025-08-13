@@ -1497,6 +1497,28 @@ export default function ResumeBuilder() {
               </div>
             )}
 
+            {/* ATS Score Analysis */}
+            {!isReorderMode && (
+              <ATSScoreCard
+                score={atsScore || {
+                  totalScore: 0,
+                  contactInfoScore: 0,
+                  keywordsScore: 0,
+                  formatScore: 0,
+                  experienceScore: 0,
+                  skillsScore: 0,
+                  suggestions: ['Start building your resume to see ATS analysis'],
+                  lastUpdated: new Date()
+                }}
+                loading={atsLoading}
+                onAnalyze={analyzeATS}
+                onViewSuggestions={() => {
+                  // Could open a detailed suggestions modal
+                  alert('Detailed suggestions modal would open here');
+                }}
+              />
+            )}
+
             {/* Live Preview */}
             <Card>
               <CardContent className="p-0">
