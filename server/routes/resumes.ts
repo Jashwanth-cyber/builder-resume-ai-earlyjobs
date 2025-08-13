@@ -75,10 +75,8 @@ export const getResumeById: RequestHandler = async (req, res) => {
 // Create a new resume
 export const createResume: RequestHandler = async (req, res) => {
   try {
-    await connectToDatabase();
-    
     const resumeData = req.body;
-    
+
     // Validate required fields
     if (!resumeData.personalInfo || !resumeData.personalInfo.fullName || !resumeData.personalInfo.email) {
       return res.status(400).json({
@@ -86,15 +84,46 @@ export const createResume: RequestHandler = async (req, res) => {
         message: 'Personal information with name and email is required'
       });
     }
-    
-    const resume = new Resume(resumeData);
-    await resume.save();
-    
-    res.status(201).json({
-      success: true,
-      data: resume,
-      message: 'Resume created successfully'
-    });
+
+    const mongoAvailable = await isMongoDBAvailable();
+
+    if (mongoAvailable) {
+      // Use MongoDB
+      const resume = new Resume(resumeData);
+      await resume.save();
+
+      res.status(201).json({
+        success: true,
+        data: resume,
+        message: 'Resume created successfully'
+      });
+    } else {
+      // Use in-memory storage
+      const resume = {
+        _id: nextId++,
+        ...resumeData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        atsScore: {
+          totalScore: 75,
+          contactInfoScore: 15,
+          keywordsScore: 20,
+          formatScore: 15,
+          experienceScore: 15,
+          skillsScore: 10,
+          suggestions: ['Add more relevant keywords', 'Include LinkedIn profile'],
+          lastUpdated: new Date()
+        }
+      };
+
+      inMemoryResumes.push(resume);
+
+      res.status(201).json({
+        success: true,
+        data: resume,
+        message: 'Resume created successfully (dev mode)'
+      });
+    }
   } catch (error) {
     console.error('Error creating resume:', error);
     res.status(500).json({
