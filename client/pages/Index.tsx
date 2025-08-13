@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Upload, Plus, FileText, Sparkles, Download, Zap, Briefcase, Lightbulb } from "lucide-react";
 
 export default function Index() {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-25 to-white">
       {/* Header */}
