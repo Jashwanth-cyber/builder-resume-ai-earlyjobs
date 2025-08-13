@@ -811,7 +811,7 @@ export default function ResumeBuilder() {
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-6">
         <div className="grid lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
           {/* Left Panel - Collapsible Sections */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {sections.map((section) => {
               const Icon = section.icon;
               const isCollapsed = collapsedSections.has(section.id);
