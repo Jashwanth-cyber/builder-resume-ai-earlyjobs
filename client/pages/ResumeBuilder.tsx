@@ -449,6 +449,8 @@ export default function ResumeBuilder() {
 
   // ATS Analysis function
   const analyzeATS = useCallback(async () => {
+    if (atsLoading) return; // Prevent duplicate calls
+
     setATSLoading(true);
     try {
       const response = await fetch('/api/ats/analyze', {
@@ -469,16 +471,24 @@ export default function ResumeBuilder() {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       if (result.success) {
         setATSScore(result.data.atsScore);
+      } else {
+        throw new Error(result.message || 'Analysis failed');
       }
     } catch (error) {
       console.error('Error analyzing ATS score:', error);
+      // Reset ATS score on error
+      setATSScore(null);
     } finally {
       setATSLoading(false);
     }
-  }, [resumeData, activeTemplate, sectionOrder]);
+  }, [resumeData, activeTemplate, sectionOrder, atsLoading]);
 
   // Save resume function
   const saveResume = useCallback(async () => {
