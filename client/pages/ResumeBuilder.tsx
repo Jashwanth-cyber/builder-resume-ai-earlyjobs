@@ -1283,7 +1283,7 @@ export default function ResumeBuilder() {
                         {/* Certifications Section */}
                         {section.id === "certifications" && (
                           <div className="space-y-4">
-                            <div className="flex space-x-2">
+                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                               <Input
                                 placeholder="Add a certification"
                                 value={currentCertification}
@@ -1295,13 +1295,16 @@ export default function ResumeBuilder() {
                                     addCertification(currentCertification);
                                   }
                                 }}
+                                className="flex-1"
                               />
                               <Button
                                 onClick={() =>
                                   addCertification(currentCertification)
                                 }
+                                className="w-full sm:w-auto"
                               >
-                                <Plus className="w-4 h-4" />
+                                <Plus className="w-4 h-4 sm:mr-0" />
+                                <span className="ml-2 sm:hidden">Add Certification</span>
                               </Button>
                             </div>
                             <div className="space-y-2">
