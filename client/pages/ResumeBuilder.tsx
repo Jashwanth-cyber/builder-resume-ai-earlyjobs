@@ -492,7 +492,6 @@ export default function ResumeBuilder() {
   }, [resumeData, activeTemplate, sectionOrder, atsLoading]);
 
   // Save resume function
-  const [isSaving, setIsSaving] = useState(false);
   const saveResume = useCallback(async () => {
     if (isSaving) return; // Prevent duplicate calls
 
