@@ -808,7 +808,7 @@ export default function ResumeBuilder() {
         </div>
       </header>
 
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-6">
+      <div className="container mx-auto px-2 sm:px-3 md:px-4 py-3 md:py-6 max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
           {/* Left Panel - Collapsible Sections */}
           <div className="space-y-3 md:space-y-4">
