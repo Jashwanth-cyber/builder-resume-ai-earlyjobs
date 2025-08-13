@@ -208,6 +208,7 @@ export default function ResumeBuilder() {
   const [currentCertification, setCurrentCertification] = useState("");
   const [atsScore, setATSScore] = useState<any>(null);
   const [atsLoading, setATSLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [savedResumeId, setSavedResumeId] = useState<string | null>(null);
 
   // Section toggle function
