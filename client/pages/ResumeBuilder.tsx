@@ -1495,23 +1495,25 @@ export default function ResumeBuilder() {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button
-                  variant={isReorderMode ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setIsReorderMode(!isReorderMode)}
-                >
-                  {isReorderMode ? (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Order
-                    </>
-                  ) : (
-                    <>
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      Reorder
-                    </>
-                  )}
-                </Button>
+                {viewMode === 'preview' && (
+                  <Button
+                    variant={isReorderMode ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIsReorderMode(!isReorderMode)}
+                  >
+                    {isReorderMode ? (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Order
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Reorder
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
 
