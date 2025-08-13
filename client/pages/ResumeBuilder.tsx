@@ -1550,6 +1550,7 @@ export default function ResumeBuilder() {
             )}
 
             {/* Live Preview */}
+            {viewMode === 'preview' && (
             <Card>
               <CardContent className="p-0">
                 <div
@@ -1664,6 +1665,7 @@ export default function ResumeBuilder() {
                 </div>
               </CardContent>
             </Card>
+            )}
           </div>
         </div>
       </div>
