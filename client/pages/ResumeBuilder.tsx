@@ -735,7 +735,7 @@ export default function ResumeBuilder() {
                 >
                   <Card className="border-gray-200">
                     <CollapsibleTrigger asChild>
-                      <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+                      <CardHeader className="cursor-pointer hover:bg-orange-50 hover:border-orange-200 transition-all duration-200 border border-transparent">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <div className="w-6 h-6 rounded flex items-center justify-center text-gray-600">
