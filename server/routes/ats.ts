@@ -2,6 +2,89 @@ import { RequestHandler } from "express";
 import Resume from "../models/Resume";
 import connectToDatabase from "../utils/database";
 
+// Helper function to check if MongoDB is available
+async function isMongoDBAvailable(): Promise<boolean> {
+  try {
+    await connectToDatabase();
+    return true;
+  } catch (error) {
+    console.warn('MongoDB not available, using mock ATS analysis for development');
+    return false;
+  }
+}
+
+// Mock ATS calculation for development
+function calculateMockATSScore(resumeData: any) {
+  let contactInfoScore = 0;
+  let keywordsScore = 0;
+  let formatScore = 0;
+  let experienceScore = 0;
+  let skillsScore = 0;
+  const suggestions: string[] = [];
+
+  // Contact Info Score (20 points)
+  const personalInfo = resumeData.personalInfo;
+  if (personalInfo?.fullName) contactInfoScore += 5;
+  if (personalInfo?.email) contactInfoScore += 5;
+  if (personalInfo?.phone) contactInfoScore += 5;
+  if (personalInfo?.location) contactInfoScore += 5;
+
+  if (!personalInfo?.linkedin) suggestions.push('Add LinkedIn profile for better visibility');
+  if (!personalInfo?.github && resumeData.skills?.some((skill: string) =>
+    ['javascript', 'python', 'java', 'react', 'node'].includes(skill.toLowerCase())
+  )) {
+    suggestions.push('Add GitHub profile to showcase your technical projects');
+  }
+
+  // Keywords Score (25 points)
+  const keywordCount = resumeData.skills?.length || 0;
+  keywordsScore = Math.min(keywordCount * 2, 25);
+  if (keywordCount < 10) suggestions.push('Add more relevant keywords to improve ATS visibility');
+
+  // Format Score (20 points)
+  if (resumeData.professionalSummary && resumeData.professionalSummary.length >= 100) formatScore += 5;
+  else suggestions.push('Add a professional summary of at least 100 characters');
+
+  if (resumeData.workExperience?.length > 0) formatScore += 5;
+  else suggestions.push('Add work experience to strengthen your resume');
+
+  if (resumeData.education?.length > 0) formatScore += 5;
+  else suggestions.push('Add education information');
+
+  if (resumeData.skills?.length >= 5) formatScore += 5;
+  else suggestions.push('Add at least 5 relevant skills');
+
+  // Experience Score (20 points)
+  const expScore = resumeData.workExperience?.reduce((score: number, exp: any) => {
+    let expPoints = 0;
+    if (exp.description && exp.description.length >= 100) expPoints += 3;
+    if (exp.position && exp.company) expPoints += 2;
+    return score + Math.min(expPoints, 5);
+  }, 0) || 0;
+  experienceScore = Math.min(expScore, 20);
+
+  if (resumeData.workExperience?.some((exp: any) => !exp.description || exp.description.length < 100)) {
+    suggestions.push('Provide detailed job descriptions with quantifiable achievements');
+  }
+
+  // Skills Score (15 points)
+  skillsScore = Math.min((resumeData.skills?.length || 0) * 1.5, 15);
+  if ((resumeData.skills?.length || 0) < 8) suggestions.push('Add more relevant skills (aim for 8-12 skills)');
+
+  const totalScore = contactInfoScore + keywordsScore + formatScore + experienceScore + skillsScore;
+
+  return {
+    totalScore: Math.round(totalScore),
+    contactInfoScore: Math.round(contactInfoScore),
+    keywordsScore: Math.round(keywordsScore),
+    formatScore: Math.round(formatScore),
+    experienceScore: Math.round(experienceScore),
+    skillsScore: Math.round(skillsScore),
+    suggestions,
+    lastUpdated: new Date()
+  };
+}
+
 // Analyze resume for ATS compatibility
 export const analyzeResume: RequestHandler = async (req, res) => {
   try {
