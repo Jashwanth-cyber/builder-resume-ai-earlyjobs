@@ -1428,7 +1428,7 @@ export default function ResumeBuilder() {
           </div>
 
           {/* Right Panel - Preview */}
-          <div className="space-y-6 sticky top-24 h-fit">
+          <div className="space-y-4 md:space-y-6 lg:sticky lg:top-24 h-fit">
             {/* Header Controls */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
