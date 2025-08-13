@@ -88,27 +88,46 @@ function calculateMockATSScore(resumeData: any) {
 // Analyze resume for ATS compatibility
 export const analyzeResume: RequestHandler = async (req, res) => {
   try {
-    await connectToDatabase();
-    
     const resumeData = req.body;
-    
-    // Create a temporary resume instance to calculate ATS score
-    const tempResume = new Resume(resumeData);
-    const atsScore = tempResume.calculateATSScore();
-    
-    // Additional ATS analysis
-    const analysis = {
-      atsScore,
-      recommendations: generateRecommendations(resumeData, atsScore),
-      keywordAnalysis: analyzeKeywords(resumeData),
-      formatAnalysis: analyzeFormat(resumeData),
-      industryBenchmark: getIndustryBenchmark(atsScore.totalScore)
-    };
-    
-    res.json({
-      success: true,
-      data: analysis
-    });
+
+    const mongoAvailable = await isMongoDBAvailable();
+
+    if (mongoAvailable) {
+      // Use MongoDB and Resume model
+      const tempResume = new Resume(resumeData);
+      const atsScore = tempResume.calculateATSScore();
+
+      // Additional ATS analysis
+      const analysis = {
+        atsScore,
+        recommendations: generateRecommendations(resumeData, atsScore),
+        keywordAnalysis: analyzeKeywords(resumeData),
+        formatAnalysis: analyzeFormat(resumeData),
+        industryBenchmark: getIndustryBenchmark(atsScore.totalScore)
+      };
+
+      res.json({
+        success: true,
+        data: analysis
+      });
+    } else {
+      // Use mock ATS calculation
+      const atsScore = calculateMockATSScore(resumeData);
+
+      const analysis = {
+        atsScore,
+        recommendations: generateRecommendations(resumeData, atsScore),
+        keywordAnalysis: analyzeKeywords(resumeData),
+        formatAnalysis: analyzeFormat(resumeData),
+        industryBenchmark: getIndustryBenchmark(atsScore.totalScore)
+      };
+
+      res.json({
+        success: true,
+        data: analysis,
+        message: 'ATS analysis completed (dev mode)'
+      });
+    }
   } catch (error) {
     console.error('Error analyzing resume:', error);
     res.status(500).json({
