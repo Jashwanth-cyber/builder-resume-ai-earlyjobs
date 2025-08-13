@@ -137,29 +137,64 @@ export const createResume: RequestHandler = async (req, res) => {
 // Update an existing resume
 export const updateResume: RequestHandler = async (req, res) => {
   try {
-    await connectToDatabase();
-    
     const { id } = req.params;
     const updateData = req.body;
-    
-    const resume = await Resume.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).select('-__v');
-    
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found'
+
+    const mongoAvailable = await isMongoDBAvailable();
+
+    if (mongoAvailable) {
+      // Use MongoDB
+      const resume = await Resume.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true, runValidators: true }
+      ).select('-__v');
+
+      if (!resume) {
+        return res.status(404).json({
+          success: false,
+          message: 'Resume not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: resume,
+        message: 'Resume updated successfully'
+      });
+    } else {
+      // Use in-memory storage
+      const resumeIndex = inMemoryResumes.findIndex(r => r._id == id);
+
+      if (resumeIndex === -1) {
+        return res.status(404).json({
+          success: false,
+          message: 'Resume not found'
+        });
+      }
+
+      inMemoryResumes[resumeIndex] = {
+        ...inMemoryResumes[resumeIndex],
+        ...updateData,
+        updatedAt: new Date(),
+        atsScore: {
+          totalScore: 75,
+          contactInfoScore: 15,
+          keywordsScore: 20,
+          formatScore: 15,
+          experienceScore: 15,
+          skillsScore: 10,
+          suggestions: ['Add more relevant keywords', 'Include LinkedIn profile'],
+          lastUpdated: new Date()
+        }
+      };
+
+      res.json({
+        success: true,
+        data: inMemoryResumes[resumeIndex],
+        message: 'Resume updated successfully (dev mode)'
       });
     }
-    
-    res.json({
-      success: true,
-      data: resume,
-      message: 'Resume updated successfully'
-    });
   } catch (error) {
     console.error('Error updating resume:', error);
     res.status(500).json({
