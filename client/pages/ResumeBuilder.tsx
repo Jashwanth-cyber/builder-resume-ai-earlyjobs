@@ -444,6 +444,86 @@ export default function ResumeBuilder() {
     }));
   }, []);
 
+  // ATS Analysis function
+  const analyzeATS = useCallback(async () => {
+    setATSLoading(true);
+    try {
+      const response = await fetch('/api/ats/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          personalInfo: resumeData.personalInfo,
+          professionalSummary: resumeData.professionalSummary,
+          education: resumeData.education,
+          workExperience: resumeData.workExperience,
+          skills: resumeData.skills,
+          certifications: resumeData.certifications,
+          projects: resumeData.projects,
+          template: activeTemplate,
+          sectionOrder
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setATSScore(result.data.atsScore);
+      }
+    } catch (error) {
+      console.error('Error analyzing ATS score:', error);
+    } finally {
+      setATSLoading(false);
+    }
+  }, [resumeData, activeTemplate, sectionOrder]);
+
+  // Save resume function
+  const saveResume = useCallback(async () => {
+    try {
+      const resumePayload = {
+        personalInfo: resumeData.personalInfo,
+        professionalSummary: resumeData.professionalSummary,
+        education: resumeData.education,
+        workExperience: resumeData.workExperience,
+        skills: resumeData.skills,
+        certifications: resumeData.certifications,
+        projects: resumeData.projects,
+        profilePicture: resumeData.profilePicture,
+        template: activeTemplate,
+        sectionOrder
+      };
+
+      const response = await fetch(savedResumeId ? `/api/resumes/${savedResumeId}` : '/api/resumes', {
+        method: savedResumeId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resumePayload),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSavedResumeId(result.data._id);
+        if (result.data.atsScore) {
+          setATSScore(result.data.atsScore);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving resume:', error);
+    }
+  }, [resumeData, activeTemplate, sectionOrder, savedResumeId]);
+
+  // Auto-save on data changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (resumeData.personalInfo.fullName && resumeData.personalInfo.email) {
+        saveResume();
+      }
+    }, 2000); // Auto-save after 2 seconds of inactivity
+
+    return () => clearTimeout(timer);
+  }, [resumeData, saveResume]);
+
   // PDF Download function
   const downloadPDF = useCallback(() => {
     // In a real implementation, you would use a library like jsPDF or html2pdf
