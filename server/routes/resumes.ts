@@ -2,6 +2,21 @@ import { RequestHandler } from "express";
 import Resume, { IResume } from "../models/Resume";
 import connectToDatabase from "../utils/database";
 
+// In-memory storage for development (fallback when MongoDB is not available)
+let inMemoryResumes: any[] = [];
+let nextId = 1;
+
+// Helper function to check if MongoDB is available
+async function isMongoDBAvailable(): Promise<boolean> {
+  try {
+    await connectToDatabase();
+    return true;
+  } catch (error) {
+    console.warn('MongoDB not available, using in-memory storage for development');
+    return false;
+  }
+}
+
 // Get all resumes for a user
 export const getResumes: RequestHandler = async (req, res) => {
   try {
