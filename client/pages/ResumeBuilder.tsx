@@ -899,7 +899,7 @@ export default function ResumeBuilder() {
                             <Separator />
                             <div className="grid grid-cols-1 gap-3">
                               <div>
-                                <Label htmlFor="fullName">Full Name *</Label>
+                                <Label htmlFor="fullName" className="text-sm font-medium">Full Name *</Label>
                                 <Input
                                   id="fullName"
                                   placeholder="Jashwanth Sheri"
