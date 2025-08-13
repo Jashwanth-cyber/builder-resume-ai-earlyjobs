@@ -2,6 +2,21 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  getResumes,
+  getResumeById,
+  createResume,
+  updateResume,
+  deleteResume,
+  getATSScore,
+  duplicateResume,
+  searchResumes
+} from "./routes/resumes";
+import {
+  analyzeResume,
+  getIndustryKeywords,
+  suggestImprovements
+} from "./routes/ats";
 
 export function createServer() {
   const app = express();
