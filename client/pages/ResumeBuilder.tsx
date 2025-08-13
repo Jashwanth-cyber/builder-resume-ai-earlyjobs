@@ -158,6 +158,7 @@ export default function ResumeBuilder() {
   const [activeTemplate, setActiveTemplate] = useState("modern");
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const [isReorderMode, setIsReorderMode] = useState(false);
+  const [viewMode, setViewMode] = useState<'preview' | 'ats'>('preview');
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
