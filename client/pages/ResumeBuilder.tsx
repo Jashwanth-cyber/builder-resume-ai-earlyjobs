@@ -1444,19 +1444,19 @@ export default function ResumeBuilder() {
                     variant={viewMode === 'preview' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('preview')}
-                    className="h-8 px-3 text-xs"
+                    className="h-7 md:h-8 px-2 md:px-3 text-xs"
                   >
-                    <Eye className="w-3 h-3 mr-1" />
-                    Preview
+                    <Eye className="w-3 h-3 md:mr-1" />
+                    <span className="hidden sm:inline">Preview</span>
                   </Button>
                   <Button
                     variant={viewMode === 'ats' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('ats')}
-                    className="h-8 px-3 text-xs"
+                    className="h-7 md:h-8 px-2 md:px-3 text-xs"
                   >
-                    <Target className="w-3 h-3 mr-1" />
-                    ATS Score
+                    <Target className="w-3 h-3 md:mr-1" />
+                    <span className="hidden sm:inline">ATS Score</span>
                   </Button>
                 </div>
               </div>
