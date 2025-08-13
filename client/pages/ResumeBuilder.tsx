@@ -979,7 +979,7 @@ export default function ResumeBuilder() {
                                   }
                                 />
                               </div>
-                              <div className="col-span-2">
+                              <div>
                                 <Label htmlFor="github">GitHub</Label>
                                 <Input
                                   id="github"
