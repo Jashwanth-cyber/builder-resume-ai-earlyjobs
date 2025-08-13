@@ -34,5 +34,20 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Resume API routes
+  app.get("/api/resumes", getResumes);
+  app.get("/api/resumes/search", searchResumes);
+  app.get("/api/resumes/:id", getResumeById);
+  app.post("/api/resumes", createResume);
+  app.put("/api/resumes/:id", updateResume);
+  app.delete("/api/resumes/:id", deleteResume);
+  app.get("/api/resumes/:id/ats-score", getATSScore);
+  app.post("/api/resumes/:id/duplicate", duplicateResume);
+
+  // ATS Analysis routes
+  app.post("/api/ats/analyze", analyzeResume);
+  app.get("/api/ats/keywords", getIndustryKeywords);
+  app.get("/api/ats/improvements/:id", suggestImprovements);
+
   return app;
 }
