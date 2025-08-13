@@ -923,6 +923,7 @@ export default function ResumeBuilder() {
                                   onChange={(e) =>
                                     updatePersonalInfo("email", e.target.value)
                                   }
+                                  className="h-9 text-sm"
                                 />
                               </div>
                               <div>
