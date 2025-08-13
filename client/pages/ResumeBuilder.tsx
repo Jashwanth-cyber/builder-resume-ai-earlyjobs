@@ -1528,7 +1528,7 @@ export default function ResumeBuilder() {
             )}
 
             {/* ATS Score Analysis */}
-            {!isReorderMode && (
+            {viewMode === 'ats' && (
               <ATSScoreCard
                 score={atsScore || {
                   totalScore: 0,
