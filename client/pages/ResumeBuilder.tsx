@@ -45,6 +45,8 @@ import {
   ChevronUp,
   Save,
   X,
+  Eye,
+  Target,
 } from "lucide-react";
 
 interface PersonalInfo {
